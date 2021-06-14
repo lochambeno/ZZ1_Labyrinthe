@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
        fenêtre 1 :OK
        fenêtre 2 : échec */
     SDL_Log("Error : SDL window 2 creation - %s\n", SDL_GetError());   
+    SDL_DestroyWindow(window_2);
     SDL_DestroyWindow(window_1);
     SDL_Quit();
     exit(EXIT_FAILURE);
@@ -89,6 +90,8 @@ int main(int argc, char **argv) {
        fenêtre 1 :OK
        fenêtre 2 : échec */
     SDL_Log("Error : SDL window 2 creation - %s\n", SDL_GetError());   // échec de la création de la fenêtre 
+    SDL_DestroyWindow(window_3);
+    SDL_DestroyWindow(window_2);
     SDL_DestroyWindow(window_1);
     SDL_Quit();
     exit(EXIT_FAILURE);
@@ -105,6 +108,9 @@ int main(int argc, char **argv) {
        fenêtre 1 :OK
        fenêtre 2 : échec */
     SDL_Log("Error : SDL window 2 creation - %s\n", SDL_GetError());   // échec de la création de la fenêtre 
+    SDL_DestroyWindow(window_4);    
+    SDL_DestroyWindow(window_3);
+    SDL_DestroyWindow(window_2);
     SDL_DestroyWindow(window_1);
     SDL_Quit();
     exit(EXIT_FAILURE);
