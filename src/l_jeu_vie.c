@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define M 50
-#define N 30
+#define M 144
+#define N 90
 
 int survie[9] = {0, 0, 1, 1, 0, 0, 0, 0, 0};
 int naissance[9] = {0, 0, 0, 1, 0, 0, 0, 0};
@@ -111,6 +111,52 @@ void iter_jeu_vie(SDL_Renderer * renderer, SDL_DisplayMode screen){
         }       
 }
 
+void init_glider(int i, int j){
+       grille_jeu[i][j+1] = 1;
+       grille_jeu[i+1][j] = 1;
+       grille_jeu[i+2][j] = 1;
+       grille_jeu[i+2][j+1] = 1;
+       grille_jeu[i+2][j+2] = 1;
+}
+
+void init_grenouille(int i, int j){
+       grille_jeu[i][j+1] = 1;
+       grille_jeu[i][j+2] = 1;
+       grille_jeu[i][j+3] = 1;
+       grille_jeu[i+1][j] = 1;
+       grille_jeu[i+1][j+1] = 1;
+       grille_jeu[i+1][j+2] = 1;
+}
+
+void init_canon(int i, int j){
+       //carre de gauche
+       grille_jeu[i+4][j] = 1;
+       grille_jeu[i+5][j] = 1;
+       grille_jeu[i+4][j+1] = 1;
+       grille_jeu[i+5][j+1] = 1;
+       //carre de droite
+       grille_jeu[i+2][j+35] = 1;
+       grille_jeu[i+2][j+34] = 1;
+       grille_jeu[i+3][j+35] = 1;
+       grille_jeu[i+3][j+34] = 1;
+       //truc de gauche
+       grille_jeu[i+2][j+12] = 1;       grille_jeu[i+2][j+13] = 1;
+       grille_jeu[i+3][j+11] = 1;       grille_jeu[i+3][j+15] = 1;
+       grille_jeu[i+4][j+10] = 1;       grille_jeu[i+4][j+16] = 1;
+       grille_jeu[i+5][j+10] = 1;       grille_jeu[i+5][j+14] = 1; 
+       grille_jeu[i+5][j+16] = 1;       grille_jeu[i+5][j+17] = 1;
+       grille_jeu[i+6][j+10] = 1;       grille_jeu[i+6][j+16] = 1;
+       grille_jeu[i+7][j+11] = 1;       grille_jeu[i+7][j+15] = 1;
+       grille_jeu[i+8][j+12] = 1;       grille_jeu[i+8][j+13] = 1;     
+       //truc de droite
+       grille_jeu[i][j+24] = 1;         grille_jeu[i+1][j+24] = 1;
+       grille_jeu[i+1][j+22] = 1;       grille_jeu[i+2][j+21] = 1;
+       grille_jeu[i+2][j+20] = 1;       grille_jeu[i+3][j+21] = 1;
+       grille_jeu[i+3][j+20] = 1;       grille_jeu[i+4][j+21] = 1;
+       grille_jeu[i+4][j+20] = 1;       grille_jeu[i+5][j+22] = 1;
+       grille_jeu[i+5][j+24] = 1;       grille_jeu[i+6][j+24] = 1;
+}
+
 void init_jeu(){
        int i, j;
        for(i=0; i<N; i++){
@@ -118,26 +164,7 @@ void init_jeu(){
                      grille_jeu[i][j] = 0;
               }
        }
-       //carre
-       /*grille_jeu[10][10] = 1;
-       grille_jeu[10][11] = 1;
-       grille_jeu[11][10] = 1;
-       grille_jeu[11][11] = 1;*/
-
-       //grenouille
-       grille_jeu[2][2] = 1;
-       grille_jeu[2][3] = 1;
-       grille_jeu[2][4] = 1;
-       grille_jeu[3][1] = 1;
-       grille_jeu[3][2] = 1;
-       grille_jeu[3][3] = 1;
-
-       //glider
-       grille_jeu[8][6] = 1;
-       grille_jeu[9][7] = 1;
-       grille_jeu[10][5] = 1;
-       grille_jeu[10][6] = 1;
-       grille_jeu[10][7] = 1;
+       init_canon(0, 0);
 }
 
 int main(int argc, char **argv) {
@@ -182,5 +209,6 @@ int main(int argc, char **argv) {
 
        SDL_DestroyRenderer(renderer);
        SDL_DestroyWindow(window);
+       SDL_Quit();
 	return 0;
 }
