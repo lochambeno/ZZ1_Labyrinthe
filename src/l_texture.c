@@ -1,8 +1,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 
-#define M 72
-#define N 45
+#define M 24
+#define N 18
 
 void end_sdl(char ok,                                                 // fin normale : ok = 0 ; anormale ok = 1
                   char const* msg,                                    // message à afficher
@@ -53,23 +53,85 @@ void afficher_eau(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer * 
          window, &window_dimension.w,
          &window_dimension.h);			//--> dim fenetre
 
-	source.x = 26;
-	source.y = 551;
+	source.x = 551;
+	source.y = 26;
 	source.h = 23;
 	source.w = 23;
 
-	zoom = 1;
+	zoom = 2;
 	destination.h = source.h*zoom;
 	destination.w = source.w*zoom;
 	
-	for(i=0; i<N; i++){
-		for(j=0; j<M; j++){
+	for(i=0; i<M; i++){
+		for(j=0; j<N; j++){
 			destination.x = i*destination.h;
 			destination.y = j*destination.w;
 
 			SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 		}
 	}
+}
+
+void afficher_terre(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer * renderer){
+	int i, j, zoom;
+	SDL_Rect	source = {0},
+				window_dimension = {0},
+				destination = {0};
+
+	SDL_GetWindowSize(
+         window, &window_dimension.w,
+         &window_dimension.h);			//--> dim fenetre
+
+	source.x = 76;
+	source.y = 1;
+	source.h = 23;
+	source.w = 23;
+
+	zoom = 2;
+	destination.h = source.h*zoom;
+	destination.w = source.w*zoom;
+	
+	//insere l'angle de terre
+	destination.x = 0;
+	destination.y = 8*destination.w;
+	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+
+	//insere la ligne de terre		
+	source.x = 101;
+	for(i=1; i<M; i++){
+		destination.x = i*destination.h;
+		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+	}
+
+	//insere la partie gauche de la ligne centrale
+	source.x = 76;
+	source.y = 26;
+
+	destination.x = 0;
+	destination.y = 9*destination.w;
+	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+
+	//insere la ligne centrale
+	source.x = 101;
+	for(i=1; i<M; i++){
+		destination.x = i*destination.h;
+		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+	}
+
+	//insere la partie gauche de la ligne du dessous
+	source.x = 76;
+	source.y = 51;
+
+	destination.x = 0;
+	destination.y = 10*destination.w;
+	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+
+	//insere la ligne centrale
+	source.x = 101;
+	for(i=1; i<M; i++){
+		destination.x = i*destination.h;
+		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+	}	
 }
 
 void anim_personnage();
@@ -82,16 +144,18 @@ int main(){
 
 	SDL_Texture * texture = NULL;
 
-	SDL_DisplayMode screen;
+	//SDL_DisplayMode screen;
 
 	if(SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
+
+	//SDL_GetCurrentDisplayMode(0, &screen);
 
 	window = SDL_CreateWindow(
 		"Test_Texture",
 		SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 
-		screen.w,
-        screen.h,
+		1080,
+        720,
 		0);
 
 	if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
@@ -101,6 +165,7 @@ int main(){
 
 	texture = charger_texture("./src/images/sprite-murs1.png", window, renderer);
 	afficher_eau(texture, window, renderer);
+	afficher_terre(texture, window, renderer);
 	SDL_RenderPresent(renderer);
 
 	while (!quit){
