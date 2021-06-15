@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     SDL_GetCurrentDisplayMode(0, &screen);
 
 	window = SDL_CreateWindow(
-		"Jeu de la vie",
+		"Animation",
 		SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 
 		screen.w,
@@ -131,9 +131,11 @@ int main(int argc, char **argv)
     my_texture = load_texture_from_image("./run.png", window, renderer);
     animation(my_texture, window, renderer);
 
+    IMG_Quit();
 
+    SDL_DestroyTexture(my_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    SDL_DestroyTexture(my_texture);
+
     return 0;
 }
