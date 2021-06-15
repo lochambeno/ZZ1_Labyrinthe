@@ -36,19 +36,19 @@ void end_sdl(char ok,
 //prend en parametre i et j et les modifie si ils sortent du tableau
 void tore(int * i, int * j){
        if(*i == -1){
-              *i = N;
+              *i = N-1;
        }
        else{
-              if(*i == N+1){
+              if(*i == N){
                      *i = 0;
               }
        }
 
        if(*j == -1){
-              *j = M;
+              *j = M-1;
        }
        else{
-              if(*j == M+1){
+              if(*j == M){
                      *j = 0;
               }
        }
@@ -76,32 +76,81 @@ int nbr_voisin(int ** tableau, int i, int j){
        return voisin;
 }
 
-void iter_jeu_vie(int ** tableau){
+//effectue une iteration du jeu de la vie (gere les naissances et les morts)
+void iter_jeu_vie(int *** tableau, SDL_Renderer * renderer, SDL_DisplayMode screen){
        int    i,
               j;
 
-       
+       SDL_Rect individu;
+       individu.w = screen.w/M;
+	individu.h = screen.h/N;
+
+        for(i=0; i<N; i++){
+               for(j=0; j<M; j++){
+                      individu.x = j*individu.w;
+                      individu.y = i*individu.h;
+
+                     if(*tableau[i][j])
+                            *tableau[i][j] = survie[nbr_voisin(*tableau, i, j)];
+                     else
+                            *tableau[i][j] = naissance[nbr_voisin(*tableau, i, j)];
+
+                     if(*tableau[i][j]){
+                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                     }
+                     else{
+                            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                     }
+                     SDL_RenderFillRect(renderer, &individu);
+               }
+        }       
 }
 
 int main(int argc, char **argv) {
 	(void)argc;
 	(void)argv;
+       int i, j;
 
-	int quit = 1;
+	int quit = 0;
 	SDL_Event event;
+       SDL_DisplayMode screen;
 
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
 
+       int ** tableau = (int**) malloc(sizeof(int*)*N);
+       for(i=0; i<N; i++){
+              tableau[i] = (int*) malloc(sizeof(int*)*M);
+              for(j=0; j<M; j++){
+                     tableau[i][j] = 0;
+              }
+       }
 
+       if (SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR SDL INIT", window, renderer);
+       SDL_GetCurrentDisplayMode(0, &screen);
+
+	window = SDL_CreateWindow(
+		"Animation",
+		SDL_WINDOWPOS_CENTERED,
+              SDL_WINDOWPOS_CENTERED, 
+		screen.w,
+              screen.h,
+		0);
+
+	if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
+
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
        while (!quit){
-    	SDL_PollEvent(&event);
+              SDL_PollEvent(&event);
 
-	if (event.type == SDL_QUIT)
-            quit = 1;
+              iter_jeu_vie(&tableau, renderer, screen);
+              SDL_RenderPresent(renderer);
 
-    }
+              if (event.type == SDL_QUIT)
+                     quit = 1;
+       }
 
 	return 0;
 }
