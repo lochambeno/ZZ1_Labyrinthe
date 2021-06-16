@@ -55,7 +55,7 @@ void draw(SDL_Renderer* renderer, int x, int y, int x1, int y1)
 }
 
 
-void deplacement(SDL_Renderer* renderer, int* x, int y, int *x1, int y1, int largeur, int pas)
+void deplacement(SDL_Renderer* renderer, int* x, int y, int *x1, int y1, int pas)
 {
 
     draw(renderer, *x, y, *x1, y1);                                                     
@@ -121,23 +121,23 @@ int main()
 
   while(x+220 <= largeur)
   {
-    deplacement(renderer, &x, y, &x1, y1, largeur, 10);
+    deplacement(renderer, &x, y, &x1, y1, 10);
   }
 
   while(y+220 <= hauteur)
   {
-    deplacement(renderer, &x, y, &x1, y1, largeur, 0);
+    deplacement(renderer, &x, y, &x1, y1, 0);
     y=y+20;
   }
 
   while(x-20 >= 0)
   {
-    deplacement(renderer, &x, y, &x1, y1,largeur, -10);
+    deplacement(renderer, &x, y, &x1, y1, -10);
   }
 
  while(y-20 >= 0)
   {
-    deplacement(renderer, &x, y, &x1, y1,largeur, 0);
+    deplacement(renderer, &x, y, &x1, y1, 0);
     y=y-20;
   }
 

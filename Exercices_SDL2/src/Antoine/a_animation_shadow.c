@@ -284,8 +284,8 @@ int main(int argc, char** argv) {
 
   /*********************************************************************************************************************/
   /*                                     On dessine dans le renderer                                                   */
-  my_texture=load_texture_from_image("./images/shadow-80x70.png", window, renderer);
-  bg_texture=load_texture_from_image("./images/nasa-xFO2Xt33xgI-unsplash.jpg", window, renderer);
+  my_texture=load_texture_from_image("./../images/shadow-80x70.png", window, renderer);
+  bg_texture=load_texture_from_image("./../images/nasa-xFO2Xt33xgI-unsplash.jpg", window, renderer);
   play_with_texture_5(bg_texture,my_texture,window,renderer);
 
 

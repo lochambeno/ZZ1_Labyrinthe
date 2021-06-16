@@ -168,8 +168,8 @@ int main(int argc, char **argv)
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-    fond_texture = load_texture_from_image("./sprite-murs.png", window, renderer);
-    run_texture = load_texture_from_image("./run.png", window, renderer);
+    fond_texture = load_texture_from_image("./../images/sprite-murs.png", window, renderer);
+    run_texture = load_texture_from_image("./../images/run.png", window, renderer);
     
     
     animation(fond_texture, run_texture, window, renderer);

@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
   /*********************************************************************************************************************/
   /*                                     On dessine dans le renderer                                                   */
-  my_texture=load_texture_from_image("./images/licorne2.png", window, renderer);
+  my_texture=load_texture_from_image("./../images/licorne2.png", window, renderer);
   play_with_texture_3(my_texture,window,renderer);
 
 

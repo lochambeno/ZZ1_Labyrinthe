@@ -1,8 +1,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 
-#define M 24
-#define N 18
+#define M 9
+#define N 6
 
 void end_sdl(char ok,                                                 // fin normale : ok = 0 ; anormale ok = 1
                   char const* msg,                                    // message à afficher
@@ -53,10 +53,14 @@ void afficher_eau(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer * 
          window, &window_dimension.w,
          &window_dimension.h);			//--> dim fenetre
 
-	source.x = 551;
-	source.y = 26;
-	source.h = 23;
-	source.w = 23;
+	SDL_QueryTexture(ma_texture,           // Récupération des dimensions de l'image
+                        NULL, NULL,
+                        &source.w, &source.h);
+
+	source.h = source.h/8;
+	source.w = source.w/12;
+	source.x = 0;
+	source.y = 3*source.h;
 
 	zoom = 2;
 	destination.h = source.h*zoom;
@@ -82,56 +86,61 @@ void afficher_terre(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer 
          window, &window_dimension.w,
          &window_dimension.h);			//--> dim fenetre
 
-	source.x = 76;
-	source.y = 1;
-	source.h = 23;
-	source.w = 23;
+	SDL_QueryTexture(ma_texture,           // Récupération des dimensions de l'image
+                        NULL, NULL,
+                        &source.w, &source.h);
 
-	zoom = 2;
+	source.h = source.h/8;
+	source.w = source.w/12;
+
+	source.x = 0;
+	source.y = source.w;
+
+	zoom = 1;
 	destination.h = source.h*zoom;
 	destination.w = source.w*zoom;
 	
-	//insere l'angle de terre
+	/*//insere l'angle de terre
 	destination.x = 0;
-	destination.y = 8*destination.w;
+	destination.y = 2*destination.w;
 	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 
 	//insere la ligne de terre		
-	source.x = 101;
+	source.x = 6*source.w;
 	for(i=1; i<M; i++){
 		destination.x = i*destination.h;
 		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 	}
 
 	//insere la partie gauche de la ligne centrale
-	source.x = 76;
-	source.y = 26;
+	source.x = 5*source.w;
+	source.y = source.h;
 
 	destination.x = 0;
-	destination.y = 9*destination.h;
-	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
+	destination.y = 3*destination.h;
+	SDL_RenderCopy(renderer, ma_texture, &source, &destination);*/
 
 	//insere la ligne centrale
-	source.x = 101;
-	for(i=1; i<M; i++){
+	destination.y = 3*destination.h;
+	for(i=0; i<M; i++){
 		destination.x = i*destination.h;
 		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 	}
 
-	//insere la partie gauche de la ligne du dessous
-	source.x = 76;
-	source.y = 51;
+	/*//insere la partie gauche de la ligne du dessous
+	source.x = 5*source.w;
+	source.y = 2*source.h;
 
 	destination.x = 0;
-	destination.y = 10*destination.w;
+	destination.y = 14*destination.w;
 	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 
 	//insere la ligne centrale
-	source.x = 101;
+	source.x = 6*source.w;
 	for(i=1; i<M; i++){
 		destination.x = i*destination.h;
 		SDL_RenderCopy(renderer, ma_texture, &source, &destination);
-	}	
+	}*/
 }
 
 void anim_personnage(	SDL_Texture * bg_texture, 
@@ -152,8 +161,7 @@ void anim_personnage(	SDL_Texture * bg_texture,
                    &source.w, &source.h);
 
 	int 	texture_h = source.h/4,
-			texture_w = source.w/8,
-			duree_animation = 40;
+			texture_w = source.w/8;
 	SDL_Rect vignettes[8];
 
 	int j;
@@ -211,8 +219,8 @@ int main(){
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-	bg_texture = charger_texture("./src/images/sprite-murs1.png", window, renderer);
-	char_texture = charger_texture("./src/images/spritemap-v9-greenpants.png", window, renderer);
+	bg_texture = charger_texture("./../images/roadTextures_tilesheet@2.png", window, renderer);
+	char_texture = charger_texture("./../images/spritemap-v9-greenpants.png", window, renderer);
 
 	while (!quit){
     	SDL_PollEvent(&event);
