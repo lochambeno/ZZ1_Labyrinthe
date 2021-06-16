@@ -2,10 +2,18 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 /*********************************************************************************************************************/
 /*                              Programme d'exemple de création de rendu + dessin                                    */
 /*********************************************************************************************************************/
+
+typedef struct couleur {
+    int R;
+    int G;
+    int B;
+} couleur_t;
 
 void end_sdl(char ok,                                                 // fin normale : ok = 0 ; anormale ok = 1
                   char const* msg,                                    // message à afficher
@@ -32,11 +40,11 @@ void end_sdl(char ok,                                                 // fin nor
   }                                                               
 }                                                                 
 
-void draw(SDL_Renderer* renderer, int x, int y, int w, int h) {                                   // Je pense que vous allez faire moins laid :)
+void draw(SDL_Renderer* renderer, int x, int y, int w, int h, couleur_t couleur) {                                   // Je pense que vous allez faire moins laid :)
   SDL_Rect rectangle;                                             
 
   SDL_SetRenderDrawColor(renderer,                                
-                              255, 0, 255,                               // mode Red, Green, Blue (tous dans 0..255)
+                              couleur.R, couleur.G, couleur.B,                               // mode Red, Green, Blue (tous dans 0..255)
                               255);                                   // 0 = transparent ; 255 = opaque
   rectangle.x = x;                                                    // x haut gauche du rectangle
   rectangle.y = y;                                                    // y haut gauche du rectangle
@@ -52,19 +60,19 @@ void draw(SDL_Renderer* renderer, int x, int y, int w, int h) {                 
   SDL_RenderClear(renderer);
 }
 
-void move(SDL_Renderer* renderer, int *x, int *y, int w, int h, int screen_width, int screen_height, int *haut, int *droite) {
+void move(SDL_Renderer* renderer, int *x, int *y, int w, int h, SDL_DisplayMode screen, int *haut, int *droite, couleur_t couleur) {
     if (*haut) {
         if (*droite) {
-            while (*x+w<screen_width && *y>0) {
-                draw(renderer, *x, *y, w, h);
+            while (*x+w<screen.w && *y>0) {
+                draw(renderer, *x, *y, w, h, couleur);
                 ++*x;
                 --*y;
             }
-            if (*x+w == screen_width) *droite=0;
+            if (*x+w == screen.w) *droite=0;
         }
         else {
             while (*x>0 && *y>0) {
-                draw(renderer, *x, *y, w, h);
+                draw(renderer, *x, *y, w, h, couleur);
                 --*x;
                 --*y;
             }
@@ -74,30 +82,33 @@ void move(SDL_Renderer* renderer, int *x, int *y, int w, int h, int screen_width
     }
     else {
         if (*droite) {
-            while (*x+w<screen_width && *y+h<screen_height) {
-                draw(renderer, *x, *y, w, h);
+            while (*x+w<screen.w && *y+h<screen.h) {
+                draw(renderer, *x, *y, w, h, couleur);
                 ++*x;
                 ++*y;
             }
-            if (*x+w == screen_width) *droite=0;
+            if (*x+w == screen.w) *droite=0;
         }
         else {
-            while (*x>0 && *y+h<screen_height) {
-                draw(renderer, *x, *y, w, h);
+            while (*x>0 && *y+h<screen.h) {
+                draw(renderer, *x, *y, w, h, couleur);
                 --*x;
                 ++*y;
             }
             if (*x==0) *droite=1;
         }
-        if (*y+h==screen_height) *haut=1;
+        if (*y+h==screen.h) *haut=1;
     }
 }
 
 int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
+  
+  srand(time(NULL));
 
   int x=0, y=0, w=400, h=200, haut=0, droite=1, i=0;
+  couleur_t couleur;
   SDL_Window* window = NULL;
   SDL_Renderer* renderer = NULL;
 
@@ -127,7 +138,10 @@ int main(int argc, char** argv) {
   /*********************************************************************************************************************/
   /*                                     On dessine dans le renderer                                                   */
   for (i=0;i<10;++i) {
-    move(renderer, &x, &y, w, h, screen.w, screen.h, &haut, &droite);
+    couleur.R=rand()%256;
+    couleur.G=rand()%256;
+    couleur.B=rand()%256;
+    move(renderer, &x, &y, w, h, screen, &haut, &droite, couleur);
   }
 
   /*********************************************************************************************************************/
