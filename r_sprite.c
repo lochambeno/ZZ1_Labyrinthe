@@ -1,5 +1,7 @@
 #include <SDL2/SDL_image.h>
 
+#define M 24
+#define N 18
 
 
 void end_sdl(char ok,                                                 // fin normale : ok = 0 ; anormale ok = 1
@@ -30,7 +32,8 @@ void end_sdl(char ok,                                                 // fin nor
         }                                                               
     }
 
-SDL_Texture* load_texture_from_image(char  *  file_image_name, SDL_Window *window, SDL_Renderer *renderer ){
+SDL_Texture* load_texture_from_image(char  *  file_image_name, SDL_Window *window, SDL_Renderer *renderer )
+{
     SDL_Surface *my_image = NULL;           // Variable de passage
     SDL_Texture* my_texture = NULL;         // La texture
 
@@ -44,11 +47,43 @@ SDL_Texture* load_texture_from_image(char  *  file_image_name, SDL_Window *windo
     if (my_texture == NULL) end_sdl(0, "Echec de la transformation de la surface en texture", window, renderer);
 
     return my_texture;
-  }
+}
 
-void animation(SDL_Texture* my_texture,
+void afficher_fond(SDL_Texture * my_texture, SDL_Window * window, SDL_Renderer * renderer){
+	int i, j, zoom;
+	SDL_Rect	source = {0},
+				window_dimension = {0},
+				destination = {0};
+
+	SDL_GetWindowSize(
+         window, &window_dimension.w,
+         &window_dimension.h);			//--> dim fenetre
+
+	source.x = 327;
+	source.y = 26;
+	source.h = 23;
+	source.w = 23;
+
+	zoom = 2;
+	destination.h = source.h*zoom;
+	destination.w = source.w*zoom;
+	
+	for(i=0; i<M; i++){
+		for(j=0; j<N; j++){
+			destination.x = i*destination.h;
+			destination.y = j*destination.w;
+
+			SDL_RenderCopy(renderer, my_texture, &source, &destination);
+		}
+	}
+}
+
+
+void animation(SDL_Texture* fond_texture,
+                         SDL_Texture* my_texture, 
                          SDL_Window* window,
-                         SDL_Renderer* renderer) {
+                         SDL_Renderer* renderer) 
+                {
        SDL_Rect 
              source = {0},                    // Rectangle définissant la zone totale de la planche
              window_dimensions = {0},         // Rectangle définissant la fenêtre, on n'utilisera que largeur et hauteur
@@ -83,17 +118,21 @@ void animation(SDL_Texture* my_texture,
 
        int speed = 9;
        for (int x = 0; x < window_dimensions.w - destination.w; x += speed) {
-         destination.x = x;                   // Position en x pour l'affichage du sprite
-         state.x += offset_x;                 // On passe à la vignette suivante dans l'image
-         state.x %= source.w;                 // La vignette qui suit celle de fin de ligne est
+        destination.x = x;                   // Position en x pour l'affichage du sprite
+        state.x += offset_x;                 // On passe à la vignette suivante dans l'image
+        state.x %= source.w;                 // La vignette qui suit celle de fin de ligne est
                                               // celle de début de ligne
 
-         SDL_RenderClear(renderer);           // Effacer l'image précédente avant de dessiner la nouvelle
-         SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
+
+
+
+        afficher_fond(fond_texture, window, renderer);
+
+        SDL_RenderCopy(renderer, my_texture, // Préparation de l'affichage
                         &state,
                         &destination);  
-         SDL_RenderPresent(renderer);         // Affichage
-         SDL_Delay(80);                       // Pause en ms
+        SDL_RenderPresent(renderer);         // Affichage
+        SDL_Delay(80);                       // Pause en ms
        }
        SDL_RenderClear(renderer);             // Effacer la fenêtre avant de rendre la main
      }
@@ -107,7 +146,9 @@ int main(int argc, char **argv)
 
     SDL_DisplayMode screen;
 
-    SDL_Texture* my_texture = NULL;
+    SDL_Texture* run_texture = NULL,
+                * fond_texture = NULL;
+
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
 
@@ -118,8 +159,8 @@ int main(int argc, char **argv)
 		"Animation",
 		SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, 
-		screen.w,
-        screen.h,
+		1080,
+        720,
 		0);
 
 	if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
@@ -127,13 +168,17 @@ int main(int argc, char **argv)
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-
-    my_texture = load_texture_from_image("./run.png", window, renderer);
-    animation(my_texture, window, renderer);
+    fond_texture = load_texture_from_image("./sprite-murs.png", window, renderer);
+    run_texture = load_texture_from_image("./run.png", window, renderer);
+    
+    
+    animation(fond_texture, run_texture, window, renderer);
 
     IMG_Quit();
 
-    SDL_DestroyTexture(my_texture);
+
+    SDL_DestroyTexture(fond_texture);
+    SDL_DestroyTexture(run_texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
