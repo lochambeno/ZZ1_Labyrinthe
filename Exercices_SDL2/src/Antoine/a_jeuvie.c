@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define N 50
-#define M 30 
+#define N 30
+#define M 50 
 
 int survie[9] = {0,0,1,1,0,0,0,0,0};
 int naissance[9] = {0,0,0,1,0,0,0,0,0};
@@ -114,19 +114,37 @@ void draw(SDL_Renderer* renderer, int i, int j, int w, int h) {                 
     SDL_SetRenderDrawColor(renderer,                                
                               255, 0, 255,                               // mode Red, Green, Blue (tous dans 0..255)
                               255);                                   // 0 = transparent ; 255 = opaque
-    rectangle.x = i*w;                                                    // x haut gauche du rectangle
-    rectangle.y = j*h;                                                    // y haut gauche du rectangle
+    rectangle.x = j*w;                                                    // x haut gauche du rectangle
+    rectangle.y = i*h;                                                    // y haut gauche du rectangle
     rectangle.w = w;                                                  // sa largeur (w = width)
     rectangle.h = h;                                                  // sa hauteur (h = height)
 
     SDL_RenderFillRect(renderer, &rectangle);
 }
 
+void draw_all(SDL_Renderer* renderer, int** grille, int w, int h) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
+    SDL_RenderClear(renderer);
+    int i, j;
+    for (i=0; i<N; ++i) {
+            for (j=0; j<M; ++j) {
+                if (grille[i][j]) draw(renderer, i, j, w, h);
+            }
+        }
+    SDL_RenderPresent(renderer);
+}
+
+void change_state(int** grille, int x, int y, int vie, SDL_DisplayMode screen) {
+    int i = y/(screen.h/N);
+    int j = x/(screen.w/M);
+    grille[i][j]=vie;
+}
+
 int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
     
-    int iter, i, j;
+    int i, x, y;
 
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
@@ -138,8 +156,6 @@ int main(int argc, char** argv) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR SDL INIT", window, renderer);
 
     SDL_GetCurrentDisplayMode(0, &screen);
-    printf("Résolution écran\n\tw : %d\n\th : %d\n", screen.w,
-                  screen.h);
 
     /* Création de la fenêtre */
     window = SDL_CreateWindow("Premier dessin",
@@ -158,10 +174,59 @@ int main(int argc, char** argv) {
     /*                                     On dessine dans le renderer                                                   */
     int** grille = init_grille();
 
+    SDL_bool
+        program_on = SDL_TRUE,                          // Booléen pour dire que le programme doit continuer
+        paused = SDL_FALSE;                             // Booléen pour dire que le programme est en pause
+    while (program_on) {                              // La boucle des évènements
+        SDL_Event event;                                // Evènement à traiter
+
+        while (program_on && SDL_PollEvent(&event)) {   // Tant que la file des évènements stockés n'est pas vide et qu'on n'a pas
+                                                        // terminé le programme Défiler l'élément en tête de file dans 'event'
+            switch (event.type) {                         // En fonction de la valeur du type de cet évènement
+            case SDL_QUIT:                                // Un évènement simple, on a cliqué sur la x de la // fenêtre
+            program_on = SDL_FALSE;                     // Il est temps d'arrêter le programme
+            break;
+            case SDL_KEYDOWN:                             // Le type de event est : une touche appuyée
+                                                        // comme la valeur du type est SDL_Keydown, dans la pratie 'union' de
+                                                        // l'event, plusieurs champs deviennent pertinents   
+            switch (event.key.keysym.sym) {             // la touche appuyée est ...
+            case SDLK_p:                                // 'p'
+            case SDLK_SPACE:                            // 'SPC'
+                paused = !paused;                         // basculement pause/unpause
+                break;
+            case SDLK_ESCAPE:                           // 'ESCAPE'  
+            case SDLK_q:                                // 'q'
+                program_on = 0;                           // 'escape' ou 'q', d'autres façons de quitter le programme                                     
+                break;
+            default:                                    // Une touche appuyée qu'on ne traite pas
+                break;
+            }
+            break;
+            case SDL_MOUSEBUTTONDOWN:                     // Click souris   
+            if (SDL_GetMouseState(&x, &y) & 
+                SDL_BUTTON(SDL_BUTTON_LEFT) ) {         // Si c'est un click gauche
+                change_state(grille, x, y, 1, screen);           // Fonction à éxécuter lors d'un click gauche
+            } else if (SDL_GetMouseState(&x, &y) & 
+                        SDL_BUTTON(SDL_BUTTON_RIGHT) ) { // Si c'est un click droit
+                change_state(grille, x, y, 0, screen);           // Fonction à éxécuter lors d'un click droit
+            }
+        break;
+        default:                                      // Les évènements qu'on n'a pas envisagé
+        break;
+        }
+    }
+    draw_all(renderer, grille, screen.w/M, screen.h/N);          // On redessine
+    if (!paused) {                                  // Si on n'est pas en pause
+        jeu_iter(grille);             // la vie continue... 
+    }
+    SDL_Delay(50);                                  // Petite pause
+    }
+
+/*
     for (iter=0; iter<500; ++iter) {
         for (i=0; i<N; ++i) {
             for (j=0; j<M; ++j) {
-                if (grille[i][j]) draw(renderer, i, j, screen.w/N, screen.h/M);
+                if (grille[i][j]) draw(renderer, i, j, screen.w/M, screen.h/N);
             }
         }
         SDL_RenderPresent(renderer);                                        // affichage
@@ -170,7 +235,7 @@ int main(int argc, char** argv) {
         SDL_RenderClear(renderer);
         jeu_iter(grille);
     }
-
+*/
 
     /*********************************************************************************************************************/
     /* on libère la grille utilisée */
