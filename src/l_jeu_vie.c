@@ -5,8 +5,24 @@
 #define M 144
 #define N 90
 
+// Regles de base
 int survie[9] = {0, 0, 1, 1, 0, 0, 0, 0, 0};
 int naissance[9] = {0, 0, 0, 1, 0, 0, 0, 0};
+
+
+/*// Mazetrice
+int survie[9] = {0, 1, 1, 1, 1, 0, 0, 0, 0};
+int naissance[9] = {0, 0, 0, 1, 0, 0, 0, 0};
+*/
+
+/*// Maze
+int survie[9] = {0, 1, 1, 1, 1, 1, 0, 0, 0};
+int naissance[9] = {0, 0, 0, 1, 0, 0, 0, 0};*/
+
+/*// Coral
+int survie[9] = {0, 0, 0, 0, 1, 1, 1, 1, 1};
+int naissance[9] = {0, 0, 0, 1, 0, 0, 0, 0};*/
+
 int grille_jeu[N][M];
 int grille_voisin[N][M];
 
@@ -81,24 +97,16 @@ void iter_nbr_voisin(){
        }
 }
 
-//effectue une iteration du jeu de la vie (gere les naissances et les morts)
-void iter_jeu_vie(SDL_Renderer * renderer, SDL_DisplayMode screen){
-       int    i,
-              j;
-
+void afficher_vie(SDL_Renderer * renderer, SDL_DisplayMode screen){
+       int i, j;
        SDL_Rect individu;
        individu.w = screen.w/M;
 	individu.h = screen.h/N;
 
-        for(i=0; i<N; i++){
-               for(j=0; j<M; j++){
-                      individu.x = j*individu.w;
-                      individu.y = i*individu.h;
-
-                     if(grille_jeu[i][j] == 1)
-                            grille_jeu[i][j] = survie[grille_voisin[i][j]];
-                     else
-                            grille_jeu[i][j] = naissance[grille_voisin[i][j]];
+       for(i=0; i<N; i++){
+              for(j=0; j<M; j++){
+                     individu.x = j*individu.w;
+                     individu.y = i*individu.h;
 
                      if(grille_jeu[i][j]){
                             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -107,6 +115,22 @@ void iter_jeu_vie(SDL_Renderer * renderer, SDL_DisplayMode screen){
                             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                      }
                      SDL_RenderFillRect(renderer, &individu);
+              }
+       }
+}
+
+//effectue une iteration du jeu de la vie (gere les naissances et les morts)
+void iter_jeu_vie(){
+       int    i,
+              j;
+
+        for(i=0; i<N; i++){
+               for(j=0; j<M; j++){
+
+                     if(grille_jeu[i][j] == 1)
+                            grille_jeu[i][j] = survie[grille_voisin[i][j]];
+                     else
+                            grille_jeu[i][j] = naissance[grille_voisin[i][j]];
                }
         }       
 }
@@ -157,6 +181,24 @@ void init_canon(int i, int j){
        grille_jeu[i+5][j+24] = 1;       grille_jeu[i+6][j+24] = 1;
 }
 
+void ajouter_vie(int x, int y, SDL_DisplayMode screen){
+       int    x_case, y_case;
+
+       x_case = x/(screen.w/M);
+       y_case = y/(screen.h/N);
+
+       grille_jeu[y_case][x_case] = 1;
+}
+
+void retirer_vie(int x, int y, SDL_DisplayMode screen){
+       int    x_case, y_case;
+
+       x_case = x/(screen.w/M);
+       y_case = y/(screen.h/N);
+
+       grille_jeu[y_case][x_case] = 0;
+}
+
 void init_jeu(){
        int i, j;
        for(i=0; i<N; i++){
@@ -164,17 +206,20 @@ void init_jeu(){
                      grille_jeu[i][j] = 0;
               }
        }
-       init_canon(0, 0);
+       
 }
 
 int main(int argc, char **argv) {
 	(void)argc;
 	(void)argv;
 
-	int quit = 0;
-	SDL_Event event;
-       SDL_DisplayMode screen;
+	int    quit = 0,
+              pause = 0,
+              mouse_x = 0,
+              mouse_y = 0;
 
+       SDL_DisplayMode screen;
+       SDL_Event event;
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
 
@@ -182,7 +227,7 @@ int main(int argc, char **argv) {
        SDL_GetCurrentDisplayMode(0, &screen);
 
 	window = SDL_CreateWindow(
-		"Jeu de la vie pas encore très vivant",
+		"Jeu de la vie",
 		SDL_WINDOWPOS_CENTERED,
               SDL_WINDOWPOS_CENTERED, 
 		screen.w,
@@ -196,15 +241,56 @@ int main(int argc, char **argv) {
 
        init_jeu();
        while (!quit){
-              SDL_PollEvent(&event);
+              
+              while(!quit && SDL_PollEvent(&event)){
+                     switch(event.type){
+                     case SDL_QUIT:
+                            quit = 1;
+                            break;
 
-              iter_nbr_voisin();
-              iter_jeu_vie(renderer, screen);
+                     case SDL_KEYDOWN:
+                            switch(event.key.keysym.sym){
+                            case SDLK_SPACE:
+                            case SDLK_p:
+                                   pause = !pause;
+                                   break;
+
+                            case SDLK_ESCAPE:
+                            case SDLK_q:
+                                   quit = 1;
+                                   break;
+
+                            case SDLK_c:
+                                   init_canon(0, 0);
+                                   break;
+
+                            case SDLK_r:
+                                   init_jeu();
+                                   break;
+
+                            default:
+                                   break;
+                            }
+                            break;
+
+                     case SDL_MOUSEBUTTONDOWN:
+                            if (SDL_GetMouseState(&mouse_x, &mouse_y) & SDL_BUTTON(SDL_BUTTON_LEFT) )
+                                   ajouter_vie(mouse_x, mouse_y, screen);
+                            else
+                                   retirer_vie(mouse_x, mouse_y, screen);
+                            break;
+                     default:
+                            break;
+                     }
+              }
+              
+              if(!pause){
+                     iter_nbr_voisin();
+                     iter_jeu_vie();
+              }
+              afficher_vie(renderer, screen);
               SDL_RenderPresent(renderer);
-              SDL_Delay(100);
-
-              if (event.type == SDL_QUIT)
-                     quit = 1;
+              SDL_Delay(50);
        }
 
        SDL_DestroyRenderer(renderer);
