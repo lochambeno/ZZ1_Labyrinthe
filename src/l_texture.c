@@ -73,7 +73,7 @@ void afficher_eau(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer * 
 }
 
 void afficher_terre(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer * renderer){
-	int i, j, zoom;
+	int i, zoom;
 	SDL_Rect	source = {0},
 				window_dimension = {0},
 				destination = {0};
@@ -108,7 +108,7 @@ void afficher_terre(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer 
 	source.y = 26;
 
 	destination.x = 0;
-	destination.y = 9*destination.w;
+	destination.y = 9*destination.h;
 	SDL_RenderCopy(renderer, ma_texture, &source, &destination);
 
 	//insere la ligne centrale
@@ -134,15 +134,63 @@ void afficher_terre(SDL_Texture * ma_texture, SDL_Window * window, SDL_Renderer 
 	}	
 }
 
-void anim_personnage();
+void anim_personnage(	SDL_Texture * bg_texture, 
+						SDL_Texture * ma_texture,
+						SDL_Window * window,
+						SDL_Renderer * renderer,
+						int * i,
+						int * position){
+	
+	SDL_Rect	source = {0},                             // Rectangle définissant la zone de la texture à récupérer
+    			window_dimensions = {0},                  // Rectangle définissant la fenêtre, on  n'utilisera que largeur et hauteur
+    			destination = {0};
+
+	SDL_GetWindowSize(window,                   // Récupération des dimensions de la fenêtre
+                    &window_dimensions.w, 
+                    &window_dimensions.h);
+	SDL_QueryTexture(ma_texture, NULL, NULL,    // Récupération des dimensions de l'image
+                   &source.w, &source.h);
+
+	int 	texture_h = source.h/4,
+			texture_w = source.w/8,
+			duree_animation = 40;
+	SDL_Rect vignettes[8];
+
+	int j;
+	for(j=0; j<8; ++j){
+		vignettes[j].x = j*texture_w;
+		vignettes[j].y = 3*texture_h;
+		vignettes[j].w = texture_w;
+		vignettes[j].h = texture_h;
+	}
+	
+	destination.x = 23;
+	destination.y = 8*46; //46 = taille d'une tile
+	destination.w = 2*texture_w;
+	destination.h = 2*texture_h;
+
+	afficher_eau(bg_texture, window, renderer);
+	afficher_terre(bg_texture, window, renderer);
+	destination.x += 2*(*position);
+
+	SDL_RenderCopy(renderer, ma_texture, &vignettes[*i], &destination);
+	*i = (*i+1)%8;
+	*position += 4;
+	SDL_RenderPresent(renderer);
+	SDL_Delay(100);
+	
+}
 
 int main(){
 	int quit = 0;
+	int i = 0,
+		position = 16;
 	SDL_Event event;
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
 
-	SDL_Texture * texture = NULL;
+	SDL_Texture * bg_texture = NULL,
+				* char_texture = NULL;
 
 	//SDL_DisplayMode screen;
 
@@ -163,19 +211,19 @@ int main(){
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-	texture = charger_texture("./src/images/sprite-murs1.png", window, renderer);
-	afficher_eau(texture, window, renderer);
-	afficher_terre(texture, window, renderer);
-	SDL_RenderPresent(renderer);
+	bg_texture = charger_texture("./src/images/sprite-murs1.png", window, renderer);
+	char_texture = charger_texture("./src/images/spritemap-v9-greenpants.png", window, renderer);
 
 	while (!quit){
     	SDL_PollEvent(&event);
+		anim_personnage(bg_texture, char_texture, window, renderer, &i, &position);
 
 		if (event.type == SDL_QUIT)
             quit = 1;
     }
 
-	SDL_DestroyTexture(texture);
+	SDL_DestroyTexture(char_texture);
+	SDL_DestroyTexture(bg_texture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
