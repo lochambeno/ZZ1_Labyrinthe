@@ -65,39 +65,39 @@ void move(SDL_Renderer* renderer, int *x, int *y, int w, int h, SDL_DisplayMode 
         if (*droite) {
             while (*x+w<screen.w && *y>0) {
                 draw(renderer, *x, *y, w, h, couleur);
-                ++*x;
-                --*y;
+                *x+=5;
+                *y-=5;
             }
-            if (*x+w == screen.w) *droite=0;
+            if (*x+w >= screen.w) *droite=0;
         }
         else {
             while (*x>0 && *y>0) {
                 draw(renderer, *x, *y, w, h, couleur);
-                --*x;
-                --*y;
+                *x-=5;
+                *y-=5;
             }
-            if (*x==0) *droite=1;
+            if (*x<=0) *droite=1;
         }
-        if (*y==0) *haut=0;
+        if (*y<=0) *haut=0;
     }
     else {
         if (*droite) {
             while (*x+w<screen.w && *y+h<screen.h) {
                 draw(renderer, *x, *y, w, h, couleur);
-                ++*x;
-                ++*y;
+                *x+=5;
+                *y+=5;
             }
-            if (*x+w == screen.w) *droite=0;
+            if (*x+w >= screen.w) *droite=0;
         }
         else {
             while (*x>0 && *y+h<screen.h) {
                 draw(renderer, *x, *y, w, h, couleur);
-                --*x;
-                ++*y;
+                *x-=5;
+                *y+=5;
             }
-            if (*x==0) *droite=1;
+            if (*x<=0) *droite=1;
         }
-        if (*y+h==screen.h) *haut=1;
+        if (*y+h>=screen.h) *haut=1;
     }
 }
 
