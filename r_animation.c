@@ -31,42 +31,47 @@ void end_sdl(char ok,                                                 // fin nor
   }                                                               
 }//trop violent il y a des exit alors qu'on est pas dans le main on doit faire sans les exit 
 
-void draw(SDL_Renderer* renderer, int x, int y) 
+void draw(SDL_Renderer* renderer, int x, int y, int x1, int y1) 
 {                                   
-  SDL_Rect rectangle;                                             
+  SDL_Rect rectangle;
+  SDL_Rect snake1;
+                                        
 
   SDL_SetRenderDrawColor(renderer,                                
-                              0, 255, 0,                              
+                              255, 255, 0,                              
                               255);                                   // 0 = transparent ; 255 = opaque
   rectangle.x = x;                                                    // x haut gauche du rectangle
   rectangle.y = y;                                                    // y haut gauche du rectangle
   rectangle.w = 200;                                                  // sa largeur (w = width)
   rectangle.h = 200;                                                  // sa hauteur (h = height)
 
+  snake1.x=x1;
+  snake1.y=y1;
+  snake1.w=50;
+  snake1.h=50;
+
   SDL_RenderFillRect(renderer, &rectangle);
+  SDL_RenderFillRect(renderer, &snake1);
 }
 
 
-void deplacement(SDL_Renderer* renderer, int* x, int y,int largeur, int pas)
+void deplacement(SDL_Renderer* renderer, int* x, int y, int *x1, int y1, int largeur, int pas)
 {
 
-    draw(renderer, *x, y);                                                     
+    draw(renderer, *x, y, *x1, y1);                                                     
     SDL_RenderPresent(renderer);                                        
-    SDL_Delay(100); 
+    SDL_Delay(10); 
     *x=*x+pas;
+    *x1=*x1+pas/2;
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-
-
 }
-
-
 
 
 
 int main() 
 {
-    int x=0, y=0, largeur, hauteur;
+    int x=0, y=0, largeur, hauteur, x1=0, y1;
 
 
   SDL_Window* window = NULL;
@@ -83,7 +88,7 @@ int main()
 
 
   /* Création de la fenêtre */
-  window = SDL_CreateWindow("Premier dessin",
+  window = SDL_CreateWindow("Animation",
                             SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, screen.w * 1,
                             screen.h * 1,
@@ -112,16 +117,31 @@ int main()
 
   largeur = display.w;
   hauteur = display.h;
+  y1=hauteur-200;
 
-  while(x+200 <= largeur)
+  while(x+220 <= largeur)
   {
-    deplacement(renderer, &x, y, largeur, 20);
+    deplacement(renderer, &x, y, &x1, y1, largeur, 10);
   }
 
-  while(x >= 0)
+  while(y+220 <= hauteur)
   {
-    deplacement(renderer, &x, y, largeur, -20);
+    deplacement(renderer, &x, y, &x1, y1, largeur, 0);
+    y=y+20;
   }
+
+  while(x-20 >= 0)
+  {
+    deplacement(renderer, &x, y, &x1, y1,largeur, -10);
+  }
+
+ while(y-20 >= 0)
+  {
+    deplacement(renderer, &x, y, &x1, y1,largeur, 0);
+    y=y-20;
+  }
+
+
     /* on referme proprement la SDL */
   end_sdl(1, "Normal ending", window, renderer);
   return EXIT_SUCCESS;
