@@ -32,17 +32,16 @@ void end_sdl(char ok,                                                 // fin nor
     }                                                               
 } 
 
-void create_sdl(SDL_Window** window, SDL_Renderer** renderer, SDL_DisplayMode* screen, TTF_Font** font, char* window_title, char* font_path, float w_size, float h_size) {
+void create_sdl(SDL_Window** window, SDL_Renderer** renderer, TTF_Font** font, char* window_title, char* font_path, float w_size, float h_size) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR SDL INIT", *window, *renderer);
-
-    SDL_GetCurrentDisplayMode(0, screen);
     
     *window = SDL_CreateWindow(window_title,
                             SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED,
-                            screen->w * w_size,
-                            screen->h * h_size,
+                            1080,
+                            720,
                             0);
+    
     if (*window == NULL) end_sdl(0, "ERROR WINDOW CREATION", *window, *renderer);
     
     *renderer = SDL_CreateRenderer(

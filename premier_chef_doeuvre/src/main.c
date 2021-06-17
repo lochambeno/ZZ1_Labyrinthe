@@ -3,22 +3,30 @@
 #include <SDL2/SDL_ttf.h>
 #include "window.h"
 #include "score.h"
+#include "vaisseau.h"
+#include "asteroid.h"
+#include <stdlib.h>
+#include <time.h>
 
-int main1() {
+#define NBR_ASTEROIDS 40
+//git checkout -t origin/... 
+
+SDL_Rect tab_asteroids[NBR_ASTEROIDS];
+
+
+/*int main1() {
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_DisplayMode screen;
     TTF_Font* font = NULL;
 
-    /* Initialisation de la SDL */
-    create_sdl(&window, &renderer, &screen, &font, "chef_d_oeuvre", "./SubZER0.ttf", 1, 1);
+     Initialisation de la SDL 
     
-    /* Variables du programme */
-    SDL_Color color_text = {255, 255, 255, 255};
-    SDL_Rect pos_text = {20, 20, 0, 0}, pos_score = {20, 20, 0, 0};
-    int score=0;
+    
+     Variables du programme 
+    
 
-    /* Boucle des événements */
+     Boucle des événements 
     SDL_bool
         program_on = SDL_TRUE,
         paused = SDL_FALSE,
@@ -56,22 +64,16 @@ int main1() {
             }
         }
         
-        afficher_score(window, renderer, font, color_text, pos_text, pos_score, score);
-
-        if (!paused) {
         
-            score+=10;
-        }
-        if (over) {
-            game_over(window, renderer, screen, font, color_text);
-        }
+
+        
         SDL_RenderPresent(renderer);
         SDL_Delay(50);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
     }
 
-    /* Fermeture de la SDL */
+     Fermeture de la SDL 
     end_sdl(1, "Normal ending", window, renderer);
 
     return 0;
@@ -79,16 +81,10 @@ int main1() {
 #include "asteroid.h"
 #include <stdlib.h>
 #include <time.h>
+*/
 
-#define NBR_ASTEROIDS 40
-//git checkout -t origin/... 
-
-SDL_Rect tab_init_ast[NBR_ASTEROIDS];
-
-
-int main3(){
-
-  	srand(time(NULL));
+int main(){
+	srand(time(NULL));
 
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
@@ -98,6 +94,12 @@ int main3(){
 				* text_fond = NULL,
 				* text_asteroid = NULL;
 
+	//SDL_DisplayMode screen;
+	SDL_Color color_text = {255, 255, 255, 255};
+    SDL_Rect pos_text = {20, 20, 0, 0}, pos_score = {20, 20, 0, 0};
+
+    TTF_Font* font = NULL;
+
 	SDL_Rect 	fond,
 				asteroid;
 
@@ -105,35 +107,17 @@ int main3(){
 
 	int fin_programme = 0,
 		pause = 0,
-		texture = 0;
+		texture = 0,
+		i,
+		score = 0,
+		over = 0;
 
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    	SDL_Log("Error : SDL initialisation - %s\n", SDL_GetError()); 
-    	exit(EXIT_FAILURE);
-  	}
+	int deplace_gauche = 0,
+		deplace_droite = 0;
 
-	window = SDL_CreateWindow(
-		"Jeu",
-		SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, 
-		1080,
-        720,
-		0);
+	create_sdl(&window, &renderer, &font, "chef_d_oeuvre", "./images/SubZER0.ttf", 1, 1);
 
-	if(window == NULL){
-		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
-		SDL_Quit();
-    	exit(EXIT_FAILURE);
-	}
-
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if(renderer == NULL){
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
-    	exit(EXIT_FAILURE);
-	}
-
+	//initialisation des textures
 	text_vaisseau = IMG_LoadTexture(renderer, "./images/redfighter5.png");
 	if (text_vaisseau == NULL){
 		SDL_DestroyRenderer(renderer);
@@ -188,8 +172,13 @@ int main3(){
 		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
     	exit(EXIT_FAILURE);
 	}
-	init_ast(1080);
+
+	//initialisation des parametres initiaux
 	vaisseau = init_vaisseau(window, text_vaisseau);
+	
+	for(i=0; i<NBR_ASTEROIDS; i++){
+		tab_asteroids[i] = creer_asteroid((i*100)%1100, -rand()%2500);
+	}
 
 	while (!fin_programme){
         SDL_Event event;
@@ -202,18 +191,27 @@ int main3(){
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym){
 					case SDLK_RIGHT:
-						if(!pause){
-							bouger_vaisseau_D(&vaisseau, 1080);
-							texture = 1;
-						}
+						deplace_droite = 1;
 						break;
 					case SDLK_LEFT:
-						if(!pause){ 
-							bouger_vaisseau_G(&vaisseau);
-							texture = 2;
-						}
+						deplace_gauche = 1;
 						break;
                     default:
+                           break;
+                    }
+                    break;
+
+				case SDL_KEYUP:
+					switch(event.key.keysym.sym){
+						case SDLK_RIGHT:
+							deplace_droite = 0;
+							break;
+
+						case SDLK_LEFT:
+							deplace_gauche = 0;
+							break;
+
+						default:
                            break;
                     }
                     break;
@@ -221,40 +219,52 @@ int main3(){
                 case SDL_MOUSEBUTTONDOWN:
                             
                 default:
-					texture = 0;
                     break;
                 }
             }
 
 		//gestion des textures
 		afficher_fond(text_fond, window, renderer);
-
-		if(!pause) {
-			for(int i=0; i<NBR_ASTEROIDS; i++){
-				deplacer_ast(&tab_init_ast[i], 3, 720);
-				afficher_ast(text_asteroid, tab_init_ast[i], renderer);
-			}
+		
+		for(int i=0; i<NBR_ASTEROIDS; i++){
+			if(!pause) deplacer_ast(&tab_asteroids[i], 3, 720);
+				afficher_ast(text_asteroid, tab_asteroids[i], renderer);
 		}
 
-		if(texture == 1){
+		//gestion du vaisseau
+		if(deplace_droite && !pause){
+			bouger_vaisseau_D(&vaisseau, 1080);
 			afficher_vaisseau(vaisseau, text_vaisseauD, renderer);
 		}
 		else
-			if(texture == 2){
+			if(deplace_gauche && !pause){
+				bouger_vaisseau_G(&vaisseau);
 				afficher_vaisseau(vaisseau, text_vaisseauG, renderer);
 			}
-			else { 
+			else{
 				afficher_vaisseau(vaisseau, text_vaisseau, renderer);
 			}
 		
+		//si on a une collision, on met en pause
+		for(i=0; i<NBR_ASTEROIDS; i++){
+			if(SDL_HasIntersection(&(vaisseau.r_collision), &tab_asteroids[i]) && !pause){
+				pause = !pause;
+				over = !over;
+			}
+		}
+
+		afficher_score(window, renderer, font, color_text, pos_text, pos_score, score);
 		//affichage des textures
+
+		if (!pause) {
+            score+=10;
+        }
+        if (over) {
+            game_over(window, renderer, font, color_text);
+        }
 		SDL_RenderPresent(renderer);
 
-		//si on a une collision, on met en pause
-		if(SDL_HasIntersection(&(vaisseau.r_collision), &asteroid) && !pause){
-			pause = !pause;
-		}
-	SDL_Delay(10);
+		SDL_Delay(10);
     }
 
 	SDL_DestroyTexture(text_asteroid);

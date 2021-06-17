@@ -43,7 +43,7 @@ void afficher_score(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font, 
     SDL_DestroyTexture(score_texture);
 }
 
-void game_over(SDL_Window* window, SDL_Renderer* renderer, SDL_DisplayMode screen, TTF_Font* font, SDL_Color color) {
+void game_over(SDL_Window* window, SDL_Renderer* renderer, TTF_Font* font, SDL_Color color) {
     SDL_Surface* text_surface = NULL;
     text_surface = TTF_RenderText_Blended(font, "GAME 0VER", color);
     if (text_surface == NULL) end_sdl(0, "Can't create text surface", window, renderer);
@@ -56,8 +56,10 @@ void game_over(SDL_Window* window, SDL_Renderer* renderer, SDL_DisplayMode scree
     SDL_Rect pos = {0, 0, 0 ,0};
     SDL_QueryTexture(text_texture, NULL, NULL, &pos.w, &pos.h);
     
-    pos.x=(screen.w-pos.w)/2;
-    pos.y=(screen.h-pos.h)/2;
+    SDL_GetWindowSize(window, &pos.x, &pos.y);
+
+    pos.x=(pos.x-pos.w)/2;
+    pos.y=(pos.y-pos.h)/2;
 
     SDL_RenderCopy(renderer, text_texture, NULL, &pos);
     SDL_DestroyTexture(text_texture);

@@ -6,9 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-SDL_Rect tab_init_ast[40];
-
-
 SDL_Rect creer_asteroid(int x, int y) 
 {                                   
   SDL_Rect rectangle;
@@ -19,16 +16,6 @@ SDL_Rect creer_asteroid(int x, int y)
   rectangle.h = 100;                                                  
 
   return rectangle;
-}
-
-void init_ast(int window_dimensions_w)
-{
-  int i;
-
-  for (i=0;i<40;++i) 
-  {
-    tab_init_ast[i] = creer_asteroid(rand()%(window_dimensions_w-100), -(rand()%2500));
-  }
 }
 
 void deplacer_ast(SDL_Rect* rectangle, int pas, int window_h)

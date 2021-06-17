@@ -1,9 +1,19 @@
-CC=gcc
-CFLAGS=-Wall -Wextra -g 
-LFLAGS=-lSDL2 -lSDL2_image
+CC= gcc
+CFLAGS= -g -Wall -Wextra
+SDLC= -lSDL2 -lSDL2_image -lSDL2_ttf
+OBJ = build/main.o build/window.o build/score.o build/asteroid.o build/vaisseau.o
 
-executable:build/main.o build/vaisseau.o build/asteroid.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+prog : $(OBJ)
+	$(CC) $^ -o $@ $(SDLC)
+
+build/main.o : src/main.c src/window.h src/score.h
+	$(CC) $(CFLAGS) -c $<
+
+build/window.o : src/window.c src/window.h
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/score.o : src/score.c src/score.h src/window.h
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/asteroid.o:src/asteroid.c
 	$(CC) -c -o $@ $<
@@ -13,3 +23,6 @@ build/vaisseau.o:src/vaisseau.c
 
 build/main.o:src/main.c src/vaisseau.h src/asteroid.h
 	$(CC) -c -o $@ $<
+
+clean : 
+	rm -f $(OBJ)
