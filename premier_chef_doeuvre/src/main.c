@@ -2,10 +2,18 @@
 #include <SDL2/SDL_image.h>
 #include "vaisseau.h"
 #include "asteroid.h"
+#include <stdlib.h>
+#include <time.h>
 
+#define NBR_ASTEROIDS 40
 //git checkout -t origin/... 
 
-int main(){
+SDL_Rect tab_init_ast[NBR_ASTEROIDS];
+
+
+int main3(){
+
+  	srand(time(NULL));
 
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
@@ -105,9 +113,8 @@ int main(){
 		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
     	exit(EXIT_FAILURE);
 	}
-
+	init_ast(1080);
 	vaisseau = init_vaisseau(window, text_vaisseau);
-	asteroid = creer_asteroid(200, 25);
 
 	while (!fin_programme){
         SDL_Event event;
@@ -144,11 +151,15 @@ int main(){
                 }
             }
 
-		if(!pause) deplacer_ast(&asteroid, 1, 720);
-
 		//gestion des textures
 		afficher_fond(text_fond, window, renderer);
-		afficher_ast(text_asteroid, &asteroid, renderer);
+
+		if(!pause) {
+			for(int i=0; i<NBR_ASTEROIDS; i++){
+				deplacer_ast(&tab_init_ast[i], 3, 720);
+				afficher_ast(text_asteroid, tab_init_ast[i], renderer);
+			}
+		}
 
 		if(texture == 1){
 			afficher_vaisseau(vaisseau, text_vaisseauD, renderer);
@@ -168,6 +179,7 @@ int main(){
 		if(SDL_HasIntersection(&(vaisseau.r_collision), &asteroid) && !pause){
 			pause = !pause;
 		}
+	SDL_Delay(10);
     }
 
 	SDL_DestroyTexture(text_asteroid);

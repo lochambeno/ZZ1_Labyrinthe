@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <SDL2/SDL_image.h>
+#include <stdlib.h>
+#include <time.h>
+
+SDL_Rect tab_init_ast[40];
+
 
 SDL_Rect creer_asteroid(int x, int y) 
 {                                   
@@ -16,25 +21,33 @@ SDL_Rect creer_asteroid(int x, int y)
   return rectangle;
 }
 
+void init_ast(int window_dimensions_w)
+{
+  int i;
 
+  for (i=0;i<40;++i) 
+  {
+    tab_init_ast[i] = creer_asteroid(rand()%(window_dimensions_w-100), -(rand()%2500));
+  }
+}
 
 void deplacer_ast(SDL_Rect* rectangle, int pas, int window_h)
 {
-    if(rectangle->y + pas <= window_h)
-      rectangle->y += pas;
-    else
-      rectangle->y = -100;
+  if(rectangle->y + pas <= window_h)
+    rectangle->y += pas;
+  else
+    rectangle->y = -(rand()%2500);
 
 }
 
 void afficher_ast(SDL_Texture* ast_texture,
-                         SDL_Rect* rectangle, 
+                         SDL_Rect rectangle, 
                          SDL_Renderer* renderer) 
 {
     SDL_Rect source = {0};
 
     SDL_QueryTexture(ast_texture, NULL, NULL, &source.w, &source.h);
-    SDL_RenderCopy(renderer, ast_texture, &source, rectangle);
+    SDL_RenderCopy(renderer, ast_texture, &source, &rectangle);
 }
 
 

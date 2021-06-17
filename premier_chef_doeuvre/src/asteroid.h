@@ -3,7 +3,9 @@
 
 SDL_Rect creer_asteroid(int , int);
 void deplacer_ast(SDL_Rect* , int , int);
-void afficher_ast(SDL_Texture* , SDL_Rect* , SDL_Renderer* );
+void afficher_ast(SDL_Texture* , SDL_Rect , SDL_Renderer* );
 void afficher_fond(SDL_Texture *, SDL_Window *, SDL_Renderer *);
+void init_ast(int);
+
 
 #endif
