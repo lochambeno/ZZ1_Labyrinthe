@@ -146,6 +146,7 @@ int main(){
 
 		if(!pause) deplacer_ast(&asteroid, 1, 720);
 
+		//gestion des textures
 		afficher_fond(text_fond, window, renderer);
 		afficher_ast(text_asteroid, &asteroid, renderer);
 
@@ -160,8 +161,10 @@ int main(){
 				afficher_vaisseau(vaisseau, text_vaisseau, renderer);
 			}
 		
+		//affichage des textures
 		SDL_RenderPresent(renderer);
 
+		//si on a une collision, on met en pause
 		if(SDL_HasIntersection(&(vaisseau.r_collision), &asteroid) && !pause){
 			pause = !pause;
 		}
