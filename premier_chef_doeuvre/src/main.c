@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "vaisseau.h"
+#include "asteroid.h"
 
 //git checkout -t origin/... 
 
@@ -10,12 +11,17 @@ int main(){
 	SDL_Renderer * renderer = NULL;
 	SDL_Texture * text_vaisseau = NULL,
 				* text_vaisseauD = NULL,
-				* text_vaisseauG = NULL;
+				* text_vaisseauG = NULL,
+				* text_fond = NULL,
+				* text_asteroid = NULL;
 
-	SDL_Rect 	vaisseau,
-				fond;
+	SDL_Rect 	fond,
+				asteroid;
+
+	vaisseau_t vaisseau;
 
 	int fin_programme = 0,
+		pause = 0,
 		texture = 0;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -75,13 +81,33 @@ int main(){
     	exit(EXIT_FAILURE);
 	}
 
-	//fond pour tester le vaisseau
-	fond.x = 0;
-	fond.y = 0;
-	fond.h = 720;
-	fond.w = 1080;
+	text_fond = IMG_LoadTexture(renderer, "./images/Space01.png");
+	if (text_vaisseau == NULL){
+		SDL_DestroyTexture(text_vaisseauD);
+		SDL_DestroyTexture(text_vaisseauG);
+		SDL_DestroyTexture(text_vaisseau);
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
+    	exit(EXIT_FAILURE);
+	}
+
+	text_asteroid = IMG_LoadTexture(renderer, "./images/Asteroids.png");
+	if (text_vaisseau == NULL){
+		SDL_DestroyTexture(text_fond);
+		SDL_DestroyTexture(text_vaisseauD);
+		SDL_DestroyTexture(text_vaisseauG);
+		SDL_DestroyTexture(text_vaisseau);
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		SDL_Quit();
+		SDL_Log("Error : window initialisation - %s\n", SDL_GetError()); 
+    	exit(EXIT_FAILURE);
+	}
 
 	vaisseau = init_vaisseau(window, text_vaisseau);
+	asteroid = creer_asteroid(200, 25);
 
 	while (!fin_programme){
         SDL_Event event;
@@ -94,12 +120,16 @@ int main(){
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym){
 					case SDLK_RIGHT:
-						bouger_vaisseau_D(&vaisseau, 1080);
-						texture = 1;
+						if(!pause){
+							bouger_vaisseau_D(&vaisseau, 1080);
+							texture = 1;
+						}
 						break;
 					case SDLK_LEFT:
-						bouger_vaisseau_G(&vaisseau);
-						texture = 2;
+						if(!pause){ 
+							bouger_vaisseau_G(&vaisseau);
+							texture = 2;
+						}
 						break;
                     default:
                            break;
@@ -113,10 +143,11 @@ int main(){
                     break;
                 }
             }
-        
-		//fond blanc
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderFillRect(renderer, &fond);
+
+		if(!pause) deplacer_ast(&asteroid, 1, 720);
+
+		afficher_fond(text_fond, window, renderer);
+		afficher_ast(text_asteroid, &asteroid, renderer);
 
 		if(texture == 1){
 			afficher_vaisseau(vaisseau, text_vaisseauD, renderer);
@@ -128,19 +159,21 @@ int main(){
 			else { 
 				afficher_vaisseau(vaisseau, text_vaisseau, renderer);
 			}
-        
-		/*SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-		SDL_RenderFillRect(renderer, &vaisseau);*/
 		
 		SDL_RenderPresent(renderer);
+
+		if(SDL_HasIntersection(&(vaisseau.r_collision), &asteroid) && !pause){
+			pause = !pause;
+		}
     }
 
-
+	SDL_DestroyTexture(text_asteroid);
+	SDL_DestroyTexture(text_fond);
 	SDL_DestroyTexture(text_vaisseauD);
 	SDL_DestroyTexture(text_vaisseauG);
 	SDL_DestroyTexture(text_vaisseau);
 	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(window); 
 	IMG_Quit();
 	SDL_Quit();
 }
