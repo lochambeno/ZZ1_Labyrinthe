@@ -5,6 +5,16 @@
 
 //(x+max)%max+1
 
+SDL_Rect init_vaisseau(SDL_Window * window, SDL_Texture * text_vaisseau){
+	SDL_DisplayMode screen;
+	SDL_Rect 	vaisseau,
+				text_vaisseau_size;
+
+	SDL_GetCurrentDisplayMode(0, &screen);
+	
+
+}
+
 //bouge le vaisseau selon la touche pressee
 void bouger_vaisseau_G(SDL_Rect * vaisseau){
 	if((*vaisseau).x - VITESSE <= 0)
@@ -21,25 +31,11 @@ void bouger_vaisseau_D(SDL_Rect * vaisseau, int largeur_fenetre){
 }
 
 //actualise l'affichage du vaisseau
-void afficher_vaisseau(SDL_Rect * vaisseau, SDL_Texture * text_vaisseau, SDL_Renderer * renderer){
+void afficher_vaisseau(SDL_Rect vaisseau, SDL_Texture * text_vaisseau, SDL_Renderer * renderer){
 	SDL_Rect source;
 
 	SDL_QueryTexture(text_vaisseau, NULL, NULL, &source.w, &source.h);
 	SDL_RenderCopy(renderer, text_vaisseau, &source, &vaisseau);
 }
 
-//a supprimer, juste la pour tester
-int main(){
-
-	SDL_Window * window = NULL;
-	SDL_Renderer * renderer = NULL;
-
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    	SDL_Log("Error : SDL initialisation - %s\n", SDL_GetError()); 
-    	exit(EXIT_FAILURE);
-  	}
-
-	
-
-}
 
