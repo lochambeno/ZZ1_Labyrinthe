@@ -176,10 +176,13 @@ int main(int argc, char** argv) {
                 break;
         }
     }
-    draw_all(renderer, grille, screen.w/M, screen.h/N);          // On redessine
-    if (!paused) {                                  // Si on n'est pas en pause
+    move(renderer, &x, &y, w, h, screen, &haut, &droite, couleur);
+    draw(renderer, x, y, w, h, couleur);
+    SDL_RenderPresent(renderer);
+    //draw_all(renderer, grille, screen.w/M, screen.h/N);          // On redessine
+    /*if (!paused) {                                  // Si on n'est pas en pause
         jeu_iter(grille);             // la vie continue... 
-    }
+    }*/
     SDL_Delay(50);                                  // Petite pause
     }
 
