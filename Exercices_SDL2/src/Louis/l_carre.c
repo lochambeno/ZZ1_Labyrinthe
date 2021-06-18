@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 void end_sdl(char ok,                                                 // fin normale : ok = 0 ; anormale ok = 1
                   char const* msg,                                    // message à afficher
@@ -27,43 +29,66 @@ void end_sdl(char ok,                                                 // fin nor
 } 
 
 //fonction permettant le deplacement du rectangle
-void mv_rect(int *h, int* v, SDL_Rect * rect, int win_w, int win_h){
-	if(*v == 0 && rect->x + 100 <= win_w){
-		rect->x = rect->x + 1;
-	}
-	else{
+void mv_rect(SDL_Renderer * renderer, int *h, int* v, int* r, int* g, int* b, SDL_Rect * rect, int win_w, int win_h){
+
+	if(*v == 0){
+		if(rect->x + 100 <= win_w)
+			rect->x = rect->x + 3;
+		else{
+			*r = rand()%255;
+			*g = rand()%255;
+			*b = rand()%255;
 			*v = 1;
-	}
-
-	if(*v == 1 && rect->x > 0){
-		rect->x = rect->x - 1;
+		}
 	}
 	else{
-		*v = 0;
+		if(*v == 1 && rect->x > 0){
+			rect->x = rect->x - 3;
+		}
+		else{
+			*r = rand()%255;
+			*g = rand()%255;
+			*b = rand()%255;
+			*v = 0;
+		}
 	}
 
-	if(*h == 0 && rect->y + 100 <= win_h){
-		rect->y = rect->y + 1;
+	if(*h ==0){
+		if(rect->y + 100 <= win_h){
+			rect->y = rect->y + 3;
+		}
+		else{
+			*r = rand()%255;
+			*g = rand()%255;
+			*b = rand()%255;
+			*h = 1;
+		}
 	}
 	else{
-		*h = 1;
+		if(rect->y > 0){
+			rect->y = rect->y - 3;
+		}
+		else{
+			*r = rand()%255;
+			*g = rand()%255;
+			*b = rand()%255;
+			*h = 0;
+		}
 	}
 
-	if(*h == 1 && rect->y > 0){
-		rect->y = rect->y - 1;
-	}
-	else{
-		*h = 0;
-	}
-
+	SDL_SetRenderDrawColor(renderer, *r, *g, *b, 255);
+	SDL_RenderFillRect(renderer, rect);
 }
 
 int main(int argc, char **argv) {
 	(void)argc;
 	(void)argv;
 
+	srand(time(NULL));
+
 	int win_h;
 	int win_w;
+	int r, g, b;
 
 	SDL_Event event;
 	SDL_Window * window = NULL;
@@ -92,7 +117,12 @@ int main(int argc, char **argv) {
 	if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
 	//on initialise le rectangle
-	SDL_SetRenderDrawColor(renderer, 0, 100, 0, 255);
+	//SDL_SetRenderDrawColor(renderer, 0, 100, 0, 255);
+	
+	r=0;
+	g=100;
+	b=0;
+	
 	rect.x = 0;
 	rect.y = 0;
 	rect.w = 100;
@@ -112,13 +142,13 @@ int main(int argc, char **argv) {
 	int d = 0, v = 0;
 	while (!quit){
     	SDL_PollEvent(&event);
-		mv_rect(&d, &v, &rect, win_w, win_h);
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderFillRect(renderer, &rect2);
 
-		SDL_SetRenderDrawColor(renderer, 0, 100, 0, 255);
-		SDL_RenderFillRect(renderer, &rect);
+		//SDL_SetRenderDrawColor(renderer, 0, 100, 0, 255);
+
+		mv_rect(renderer, &d, &v, &r, &g, &b, &rect, win_w, win_h);
 
 		SDL_RenderPresent(renderer);
 
