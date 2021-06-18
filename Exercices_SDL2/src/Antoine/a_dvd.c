@@ -102,50 +102,90 @@ void move(SDL_Renderer* renderer, int *x, int *y, int w, int h, SDL_DisplayMode 
 }
 
 int main(int argc, char** argv) {
-  (void)argc;
-  (void)argv;
-  
-  srand(time(NULL));
+    (void)argc;
+    (void)argv;
+    
+    srand(time(NULL));
 
-  int x=0, y=0, w=400, h=200, haut=0, droite=1, i=0;
-  couleur_t couleur;
-  SDL_Window* window = NULL;
-  SDL_Renderer* renderer = NULL;
+    int x=0, y=0, w=400, h=200, haut=0, droite=1, i=0;
+    couleur_t couleur;
+    SDL_Window* window = NULL;
+    SDL_Renderer* renderer = NULL;
 
-  SDL_DisplayMode screen;
+    SDL_DisplayMode screen;
 
-/*********************************************************************************************************************/  
-/*                         Initialisation de la SDL  + gestion de l'échec possible                                   */
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR SDL INIT", window, renderer);
+    /*********************************************************************************************************************/  
+    /*                         Initialisation de la SDL  + gestion de l'échec possible                                   */
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) end_sdl(0, "ERROR SDL INIT", window, renderer);
 
-  SDL_GetCurrentDisplayMode(0, &screen);
-  printf("Résolution écran\n\tw : %d\n\th : %d\n", screen.w,
-              screen.h);
+    SDL_GetCurrentDisplayMode(0, &screen);
+    printf("Résolution écran\n\tw : %d\n\th : %d\n", screen.w,
+                screen.h);
 
-  /* Création de la fenêtre */
-  window = SDL_CreateWindow("Premier dessin",
-                            SDL_WINDOWPOS_CENTERED,
-                            SDL_WINDOWPOS_CENTERED, screen.w,
-                            screen.h,
-                            SDL_WINDOW_OPENGL);
-  if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
+    /* Création de la fenêtre */
+    window = SDL_CreateWindow("Premier dessin",
+                                SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED, screen.w,
+                                screen.h,
+                                SDL_WINDOW_OPENGL);
+    if (window == NULL) end_sdl(0, "ERROR WINDOW CREATION", window, renderer);
 
-  /* Création du renderer */
-  renderer = SDL_CreateRenderer(
-           window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
+    /* Création du renderer */
+    renderer = SDL_CreateRenderer(
+            window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == NULL) end_sdl(0, "ERROR RENDERER CREATION", window, renderer);
 
-  /*********************************************************************************************************************/
-  /*                                     On dessine dans le renderer                                                   */
-  for (i=0;i<10;++i) {
-    couleur.R=rand()%256;
-    couleur.G=rand()%256;
-    couleur.B=rand()%256;
-    move(renderer, &x, &y, w, h, screen, &haut, &droite, couleur);
-  }
+    /*********************************************************************************************************************/
+    /*                                     On dessine dans le renderer                                                   */
+    for (i=0;i<10;++i) {
+        couleur.R=rand()%256;
+        couleur.G=rand()%256;
+        couleur.B=rand()%256;
+        move(renderer, &x, &y, w, h, screen, &haut, &droite, couleur);
+    }
 
-  /*********************************************************************************************************************/
-  /* on referme proprement la SDL */
-  end_sdl(1, "Normal ending", window, renderer);
+    SDL_bool
+        program_on = SDL_TRUE,                          // Booléen pour dire que le programme doit continuer
+        paused = SDL_FALSE;                             // Booléen pour dire que le programme est en pause
+    while (program_on) {                              // La boucle des évènements
+        SDL_Event event;                                // Evènement à traiter
+
+        while (program_on && SDL_PollEvent(&event)) {   // Tant que la file des évènements stockés n'est pas vide et qu'on n'a pas
+                                                        // terminé le programme Défiler l'élément en tête de file dans 'event'
+            switch (event.type) {                         // En fonction de la valeur du type de cet évènement
+            case SDL_QUIT:                                // Un évènement simple, on a cliqué sur la x de la // fenêtre
+                program_on = SDL_FALSE;                     // Il est temps d'arrêter le programme
+                break;
+            case SDL_KEYDOWN:                             // Le type de event est : une touche appuyée
+                                                        // comme la valeur du type est SDL_Keydown, dans la pratie 'union' de
+                                                        // l'event, plusieurs champs deviennent pertinents   
+                switch (event.key.keysym.sym) {             // la touche appuyée est ...
+                case SDLK_p:                                // 'p'
+                case SDLK_SPACE:                            // 'SPC'
+                    paused = !paused;                         // basculement pause/unpause
+                    break;
+                case SDLK_ESCAPE:                           // 'ESCAPE'  
+                case SDLK_q:                                // 'q'
+                    program_on = 0;                           // 'escape' ou 'q', d'autres façons de quitter le programme                                     
+                    break;
+                default:                                    // Une touche appuyée qu'on ne traite pas
+                    break;
+                }
+                break;
+            default:                                      // Les évènements qu'on n'a pas envisagé
+                break;
+        }
+    }
+    draw_all(renderer, grille, screen.w/M, screen.h/N);          // On redessine
+    if (!paused) {                                  // Si on n'est pas en pause
+        jeu_iter(grille);             // la vie continue... 
+    }
+    SDL_Delay(50);                                  // Petite pause
+    }
+
+
+    /*********************************************************************************************************************/
+    /* on referme proprement la SDL */
+    end_sdl(1, "Normal ending", window, renderer);
   return EXIT_SUCCESS;
 }
