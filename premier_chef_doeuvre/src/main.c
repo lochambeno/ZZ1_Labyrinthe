@@ -11,80 +11,10 @@
 #define NBR_ASTEROIDS 40
 //git checkout -t origin/... 
 
-SDL_Rect tab_asteroids[NBR_ASTEROIDS];
-
-
-/*int main1() {
-    SDL_Window* window = NULL;
-    SDL_Renderer* renderer = NULL;
-    SDL_DisplayMode screen;
-    TTF_Font* font = NULL;
-
-     Initialisation de la SDL 
-    
-    
-     Variables du programme 
-    
-
-     Boucle des événements 
-    SDL_bool
-        program_on = SDL_TRUE,
-        paused = SDL_FALSE,
-        over = SDL_FALSE;
-    while (program_on) {
-        SDL_Event event;
-
-        while (program_on && SDL_PollEvent(&event)) {
-                                                        
-            switch (event.type) {
-            case SDL_QUIT:
-                program_on = SDL_FALSE;
-                break;
-            case SDL_KEYDOWN:
-                                                        
-                switch (event.key.keysym.sym) {
-                case SDLK_p:
-                case SDLK_SPACE:
-                    paused = !paused;
-                    break;
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                    program_on = 0;
-                    break;
-                case SDLK_k:
-                    paused = !paused;
-                    over = SDL_TRUE;
-                    break;
-                default:
-                    break;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        
-        
-
-        
-        SDL_RenderPresent(renderer);
-        SDL_Delay(50);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-    }
-
-     Fermeture de la SDL 
-    end_sdl(1, "Normal ending", window, renderer);
-
-    return 0;
-#include "vaisseau.h"
-#include "asteroid.h"
-#include <stdlib.h>
-#include <time.h>
-*/
-
 int main(){
 	srand(time(NULL));
+
+	SDL_Rect tab_asteroids[NBR_ASTEROIDS];
 
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL;
@@ -274,6 +204,7 @@ int main(){
 	SDL_DestroyTexture(text_vaisseau);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window); 
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
