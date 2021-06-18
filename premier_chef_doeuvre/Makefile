@@ -6,9 +6,6 @@ OBJ = build/main.o build/window.o build/score.o build/asteroid.o build/vaisseau.
 prog : $(OBJ)
 	$(CC) $^ -o $@ $(SDLC)
 
-build/main.o : src/main.c src/window.h src/score.h
-	$(CC) $(CFLAGS) -c $<
-
 build/window.o : src/window.c src/window.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -21,7 +18,7 @@ build/asteroid.o:src/asteroid.c
 build/vaisseau.o:src/vaisseau.c
 	$(CC) -c -o $@ $<
 
-build/main.o:src/main.c src/vaisseau.h src/asteroid.h
+build/main.o:src/main.c src/vaisseau.h src/asteroid.h src/window.h src/score.h
 	$(CC) -c -o $@ $<
 
 clean : 

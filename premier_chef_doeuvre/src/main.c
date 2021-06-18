@@ -45,7 +45,7 @@ int main(){
 	int deplace_gauche = 0,
 		deplace_droite = 0;
 
-	create_sdl(&window, &renderer, &font, "chef_d_oeuvre", "./images/SubZER0.ttf", 1, 1);
+	create_sdl(&window, &renderer, &font, "chef_d_oeuvre", "./images/SubZER0.ttf");
 
 	//initialisation des textures
 	text_vaisseau = IMG_LoadTexture(renderer, "./images/redfighter5.png");
@@ -126,8 +126,21 @@ int main(){
 					case SDLK_LEFT:
 						deplace_gauche = 1;
 						break;
+					case SDLK_r:
+						vaisseau = init_vaisseau(window, text_vaisseau);
+	
+						for(i=0; i<NBR_ASTEROIDS; i++){
+							tab_asteroids[i] = creer_asteroid((i*100)%1100, -rand()%2500);
+						}
+						over=0;
+						pause=0;
+						score=0;
+						break;
+					case SDLK_ESCAPE:
+						fin_programme = 1;
+						break;
                     default:
-                           break;
+                        break;
                     }
                     break;
 
@@ -156,7 +169,7 @@ int main(){
 		//gestion des textures
 		afficher_fond(text_fond, window, renderer);
 		
-		for(int i=0; i<NBR_ASTEROIDS; i++){
+		for(i=0; i<NBR_ASTEROIDS; i++){
 			if(!pause) deplacer_ast(&tab_asteroids[i], 3, 720);
 				afficher_ast(text_asteroid, tab_asteroids[i], renderer);
 		}
