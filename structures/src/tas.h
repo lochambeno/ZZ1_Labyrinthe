@@ -5,16 +5,26 @@ typedef int data_t;
 typedef struct tas_c{
 	data_t * tas;
 	int nbr_elements; 
+	int taille;
 }tas_t;
 
-void init_tas(int , tas_t *);
+tas_t init_tas(int);
+tas_t creer_tas(data_t tab[], int);
 void liberer_tas(tas_t *);
 
-int parent(int fils);
-int enfant_G(int parent);
-int enfant_D(int parent);
+int parent(int);
+int enfant_G(int);
+int enfant_D(int);
 
-void echange(data_t * a, data_t * b);
-void inserer_tas(tas_t * tas, int valeur);
+void echange(data_t *, data_t *);
+int inserer_tas(tas_t *, data_t);
+
+int est_vide_tas(tas_t);
+int min_tas(tas_t, int, int);
+
+data_t * sommet_tas(tas_t *);
+void supprimer_tas(tas_t */*, int*/);
+
+int tri_tas(data_t (*tab)[], int);
 
 #endif
