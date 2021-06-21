@@ -1,11 +1,22 @@
-#include "tas.h"
+#include "partition.h"
 #include <stdio.h>
 
-int main(){	
-	data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
+int main()
+{	
+	part_t part = init_part(11);
 
-	tri_tas(&tab, 9);
-	for(int i=0; i<9; i++){
-		printf("%d\n", tab[i]);
-	}
+	fusion_part(&part, 0, 1);
+	fusion_part(&part, 2, 3);
+	fusion_part(&part, 10, 3);
+	fusion_part(&part, 5, 9);
+	fusion_part(&part, 4, 6);
+	fusion_part(&part, 8, 7);
+	fusion_part(&part, 9, 7);
+	fusion_part(&part, 6, 8);
+
+
+
+	afficher_part(part);
+
+
 }

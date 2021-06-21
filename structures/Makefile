@@ -1,15 +1,15 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
 LFLAGS=
-OBJ= build/window.o build/main.o
+OBJ= build/partition.o build/main.o
 
 prog:$(OBJ)
 	$(CC) $^ -o $@ 
 
-build/window.o:src/tas.c src/tas.h
+build/partition.o:src/partition.c src/partition.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-build/main.o:src/main.c src/tas.h
+build/main.o:src/main.c src/partition.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean : 
