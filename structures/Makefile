@@ -1,12 +1,15 @@
 CC= gcc
-CFLAGS= -g -Wall -Wextra
-LFLAGS=
-OBJ= build/window.o build/main.o
+CFLAGS= -g -Wall -Wextra -O2
+LDFLAGS=
+OBJ= build/tas.o build/main.o build/partition.o
 
 prog:$(OBJ)
-	$(CC) $^ -o $@ 
+	$(CC) $^ -o $@ $(LDFLAGS)
 
-build/window.o:src/tas.c src/tas.h
+build/partition.o:src/partition.c src/partition.h
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/tas.o:src/tas.c src/tas.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/main.o:src/main.c src/tas.h
@@ -14,3 +17,7 @@ build/main.o:src/main.c src/tas.h
 
 clean : 
 	rm -f $(OBJ)
+
+afficher :
+	dot -Tpng files/affichage.dot -o files/affichage.png
+	open files/affichage.png
