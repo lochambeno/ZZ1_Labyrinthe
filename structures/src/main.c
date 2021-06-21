@@ -14,9 +14,14 @@ int main()
 	fusion_part(&part, 9, 7);
 	fusion_part(&part, 6, 8);
 
+	liste_t** liste = lister_classes(part);
 
 
 	afficher_part(part);
 
+	liberer_classes(liste, part.taille);
+	liberer_partition(&part);
 
+
+	return 0;
 }

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "partition.h"
+#include "liste.h"
+
 
 
 
@@ -86,4 +88,52 @@ void fusion_part(part_t* p_part, int x, int y)
             p_part->hauteur[x]++;
         }
     }
+}
+
+
+liste_t* lister_elt(part_t part, int classe)
+{
+    int i;
+    liste_t* liste_elt = creer_liste();
+    for(i=0; i<part.taille; ++i)
+    {
+        if(recuperer_classe(part, i) == classe)
+        {
+            inserer(&liste_elt, i);
+        }
+    }
+    return liste_elt;
+}
+
+
+liste_t** lister_classes(part_t part)
+{
+    liste_t** liste_classes = (liste_t**)malloc((part.taille)*sizeof(liste_t));
+    int i;
+    if(liste_classes != NULL)
+    {
+        for(i=0; i<part.taille; ++i)
+        {
+            inserer(&(liste_classes[recuperer_classe(part, i)]), i);
+        }
+    }
+    return liste_classes;
+}
+
+
+
+void liberer_classes(liste_t ** liste_classes, int taille)
+{
+    int i;
+    for(i=0; i<taille; ++i)
+    {
+        liberer_liste(liste_classes[i]);
+    }
+    free(liste_classes);
+}
+
+void liberer_partition(part_t* p_part)
+{
+    free(p_part->parent);
+	free(p_part->hauteur);
 }
