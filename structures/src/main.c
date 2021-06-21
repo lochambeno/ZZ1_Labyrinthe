@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include "tas.h"
 #include "partition.h"
-#include <stdio.h>
+#include "liste.h"
 
 int main(){	
 	/*data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
@@ -10,6 +11,7 @@ int main(){
 		printf("%d\n", tab[i]);
 	}*/
 	
+	liste_t ** liste = NULL;
 	partition_t partition;
 	partition = init_partition(11);
 
@@ -22,7 +24,13 @@ int main(){
 	fusion_partition(9, 7, &partition);
 	fusion_partition(6, 8, &partition);
 
-	creer_affichage_partition(partition);
+	liste = liste_classes_partition(partition);
+	afficher_table_partition(liste, partition.taille);
+
+	liberer_table_partition(&liste, partition.taille);
+	liberer_partition(&partition);
+
+	//creer_affichage_partition(partition);
 
 	return 0;
 }
