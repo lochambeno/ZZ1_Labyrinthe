@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tas_binaire.h"
+#define TAILLE 5
 
-void init_tas(int taille, tas_t* p_tas) {
-    p_tas->nbr_elements = 0;
-    p_tas->tas=(data_t*)malloc(taille*sizeof(data_t));
-
-    if (p_tas->tas == NULL) p_tas = NULL;
+tas_t init_tas() {
+    tas_t tas;
+    tas.nbr_elements = 0;
+    tas.taille=TAILLE;
+    tas.tas=(data_t*)malloc(tas.taille*sizeof(data_t));
+    return tas;
 }
 
 void liberer_tas(tas_t* p_tas) {
@@ -31,14 +33,23 @@ void echange_tas(tas_t* p_tas, int i, int j) {
     p_tas->tas[j] = temp;
 }
 
-void inserer_tas(tas_t* p_tas, data_t value) {
+int inserer_tas(tas_t* p_tas, data_t value) {
     int i = p_tas->nbr_elements;
+    int error = 0;
+    if (i==p_tas->taille) {
+        data_t* temp=NULL;
+        p_tas->taille*=1.5;
+        temp=(data_t*)realloc(p_tas->tas, (p_tas->taille)*sizeof(data_t));
+        if (temp == NULL) error =1;
+        else p_tas->tas=temp;    
+    }
     p_tas->tas[i] = value;
     while (p_tas->tas[parent(i)]>value) {
         echange_tas(p_tas, i, parent(i));
         i=parent(i);
     }
     ++(p_tas->nbr_elements);
+    return error;
 }
 
 int min_enfant(tas_t tas, int i) {
@@ -54,13 +65,14 @@ void supprimer_tas(tas_t* p_tas, int i) {
 
     do {
         j=enfant_gauche(i);
-        if (j <= nbr_elements) {
-            if (enfant_droite(i) <= nbr_elements) {
+        if (j <= nbr_elements-1) {
+            if (enfant_droite(i) <= nbr_elements-1) {
                 j=min_enfant(*p_tas, i);
                 if (p_tas->tas[i] > p_tas->tas[j]) {
                     echange_tas(p_tas, i, j);
                     i=j;
                 }
+                else fin=1;
             }
             else {
                 if (p_tas->tas[i] > p_tas->tas[j]) {
@@ -73,10 +85,38 @@ void supprimer_tas(tas_t* p_tas, int i) {
     } while (!fin);
 }
 
+int tri_tas(data_t liste[], int nbr_elements) {
+    int i=0, error=0;
+    tas_t tas = init_tas();
+    if (tas.tas!=NULL) {
+        while (!error && i<nbr_elements) {
+            if (inserer_tas(&tas, liste[i])) error=1;
+            ++i;
+        }
+        i=0;
+        while (!error && tas.nbr_elements>0) {
+            liste[i]=tas.tas[0];
+            supprimer_tas(&tas, 0);
+            ++i;
+        }
+        liberer_tas(&tas);
+    }
+    else error=1;
+    return error;
+}
+
 void afficher_tas(tas_t tas) {
-    int i = 0;
+    int i;
     for (i=0;i<tas.nbr_elements;++i) {
         printf("%d ", tas.tas[i]);
+    }
+    printf("\n");
+}
+
+void afficher_liste(data_t liste[], int nbr_elements) {
+    int i;
+    for (i=0;i<nbr_elements;++i) {
+        printf("%d ", liste[i]);
     }
     printf("\n");
 }
