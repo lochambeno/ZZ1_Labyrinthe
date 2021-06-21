@@ -1,5 +1,5 @@
 CC= gcc
-CFLAGS= -g -Wall -Wextra -O2
+CFLAGS= -g -Wall -Wextra
 LDFLAGS=
 OBJ= build/tas.o build/main.o build/partition.o build/liste.o
 
