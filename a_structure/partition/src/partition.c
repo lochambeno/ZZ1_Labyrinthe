@@ -26,11 +26,12 @@ int recuperer_classe(part_t part, int i) {
 void fusion_classe(part_t part, int i, int j) {
     i=recuperer_classe(part, i);
     j=recuperer_classe(part, j);
-    if (part.hauteur[i] < part.hauteur[j]) part.parent[i]=j;
-    else 
-    {
-        part.parent[j]=i;
-        if (part.hauteur[i] == part.hauteur[j]) ++part.hauteur[i];
+    if (i!=j) {
+        if (part.hauteur[i] < part.hauteur[j]) part.parent[i]=j;
+        else {
+            part.parent[j]=i;
+            if (part.hauteur[i] == part.hauteur[j]) ++part.hauteur[i];
+        }
     }
 }
 
@@ -55,28 +56,82 @@ liste_t** creer_tab(part_t part) {
     liste_t** tab = (liste_t**)malloc(part.taille*sizeof(liste_t*));
     int i;
     for (i=0;i<part.taille;++i) {
+        tab[i]=NULL;
+    }
+    for (i=0;i<part.taille;++i) {
         inserer_liste(&(tab[part.parent[i]]),i);
     }
     return tab;
 }
 
-void lister_classe(part_t part, int i) {
+classe_t lister_classe(part_t part, int i) {
     liste_t** tab=creer_tab(part);
-    parcours_rec(tab, part.parent[i]);
-    printf("\n");
+    classe_t classe;
+    classe.liste=(int*)malloc(part.taille*sizeof(int));
+    classe.taille=0;
+    parcours_rec(tab, recuperer_classe(part, i), &classe);
+    liberer_tableau(tab, part.taille);
+    return classe;
 }
 
-void parcours_rec(liste_t** tab, int i) {
+void parcours_rec(liste_t** tab, int i, classe_t* classe) {
     liste_t* cour=tab[i];
     while (cour!=NULL) {
-        printf("%d ", cour->valeur);
-        if (cour->valeur != i) parcours_rec(tab, cour->valeur);
+        classe->liste[classe->taille]=cour->valeur;
+        ++(classe->taille);
+        if (cour->valeur != i) parcours_rec(tab, cour->valeur, classe);
         cour=cour->suivant;
     }
 }
 
+classe_t* lister_partition(part_t part) {
+    liste_t** tab=creer_tab(part);
+    int i;
+    classe_t* tableau_classe=(classe_t*)malloc(part.taille*sizeof(classe_t));
+    for (i=0;i<part.taille;++i) {
+        tableau_classe[i].liste=NULL;
+        if (i==part.parent[i]) {
+            tableau_classe[i].liste=(int*)malloc(part.taille*sizeof(int));
+            tableau_classe[i].taille=0;
+            parcours_rec(tab, i, &tableau_classe[i]);
+        }
+    }
+    liberer_tableau(tab, part.taille);
+    return tableau_classe;
+}
+
+void liberer_liste(liste_t* l)
+{
+    liste_t *cour = l, *temp = NULL;
+    while (cour != NULL)
+    { 
+        temp = cour;
+        cour = cour->suivant;
+        free(temp);
+    }
+}
+
+void liberer_tableau(liste_t** tab, int taille) {
+    int i;
+    for (i=0;i<taille;++i) {
+        if (tab[i]!=NULL) liberer_liste(tab[i]);
+    }
+    free(tab);
+}
+
+void liberer_classe(classe_t classe) {
+    free(classe.liste);
+}
+
+void liberer_tableau_classe(classe_t* tableau_classe, int taille) {
+    int i;
+    for (i=0;i<taille;++i) {
+        free(tableau_classe[i].liste);
+    }
+}
+
 void afficher_part(part_t part) {
-    FILE* fichier = fopen("src/affichage.dot","w+");
+    FILE* fichier = fopen("file/partition.dot","w+");
     int i;
     if (fichier != NULL) {
         fprintf(fichier, "digraph Partition {\n");
@@ -97,5 +152,26 @@ void afficher_tableau(liste_t** tab) {
             cour=cour->suivant;
         }
         printf("\n");
+    }
+}
+
+void afficher_classe(classe_t classe) {
+    int i;
+    for (i=0;i<classe.taille;++i) {
+        printf("%d ", classe.liste[i]);
+    }
+    printf("\n");
+}
+
+void afficher_tableau_classe(classe_t* tableau_classe, int taille) {
+    int i,j;
+    for (i=0;i<taille;++i) {
+        if (tableau_classe[i].liste!=NULL) {
+            printf("Classe : %d\n", i);
+            for(j=0;j<tableau_classe[i].taille;++j) {
+                printf("%d ", tableau_classe[i].liste[j]);
+            }
+            printf("\n");
+        }
     }
 }
