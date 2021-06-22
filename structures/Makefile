@@ -1,10 +1,13 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
 LDFLAGS=
-OBJ= build/tas.o build/main.o build/partition.o build/liste.o
+OBJ= build/tas.o build/main.o build/partition.o build/liste.o build/graphe.o
 
 prog:$(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
+
+build/graphe.o:src/graphe.c src/graphe.h
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/partition.o:src/partition.c src/partition.h src/liste.h
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -24,3 +27,7 @@ clean :
 afficher :
 	dot -Tpng files/affichage.dot -o files/affichage.png
 	open files/affichage.png
+
+afficher_graphe :
+	dot -Tpng files/graphe.dot -o files/graphe.png
+	open files/graphe.png

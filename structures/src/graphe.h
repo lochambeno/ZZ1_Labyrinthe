@@ -16,5 +16,8 @@ typedef struct graphe_c{
 
 graphe_t init_graphe();
 void ajouter_noeud_graphe(int, graphe_t *);
+void ajouter_arrete_graphe(int, int, graphe_t *);
+void affichage_graphe(graphe_t);
+graphe_t graphe_aleatoire(int , int );
 
 #endif

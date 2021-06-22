@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graphe.h"
+#include "partition.h"
 
 //il faut verifier la taille du graphe ou le tableau apres initialisation
 graphe_t init_graphe(int nbr_noeuds){
@@ -74,3 +75,18 @@ void affichage_graphe(graphe_t graphe){
 	fprintf(fichier_dot, "}");
 	fclose(fichier_dot);
 }
+
+graphe_t graphe_aleatoire(int taille, int nbr_arrete){
+	int i;
+	graphe_t graphe = init_graphe(taille);
+
+	for(i=0; i<nbr_arrete; i++){
+		ajouter_arrete_graphe(rand()%taille, rand()%taille, &graphe);
+	}
+
+	return graphe;
+}
+/*
+partition_t composantes_connexes(graphe_t graphe){
+
+}*/
