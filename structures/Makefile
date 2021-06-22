@@ -1,6 +1,6 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
-LDFLAGS= -lSDL2
+LDFLAGS= -lSDL2 -lSDL2_image
 OBJ= build/tas.o build/main.o build/partition.o build/liste.o build/graphe.o build/labyrinthe.o
 
 prog:$(OBJ)
@@ -21,7 +21,7 @@ build/tas.o:src/tas.c src/tas.h
 build/liste.o:src/liste.c src/liste.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-build/main.o:src/main.c src/tas.h
+build/main.o:src/main.c src/tas.h src/partition.h src/liste.h src/graphe.h src/labyrinthe.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean : 

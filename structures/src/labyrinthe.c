@@ -31,27 +31,45 @@ int direction_labyrinthe(int i, int j, int largeur){
 	int direction = 0;
 
 	if(i/largeur < j/largeur){
-		direction += 2;
+		direction = 2;
 	}
 	else{
 		if(i/largeur > j/largeur){
-			direction += 1;
+			direction = 1;
 		}
-	}
-
-	if(i%largeur < j%largeur){
-		direction += 4;
-	}
-	else{
-		if(i/largeur > j/largeur){
-			direction += 8;
+		else{
+			if(i%largeur < j%largeur){
+				direction = 4;
+			}
+			else{
+				if(i%largeur > j%largeur){
+				direction = 8;
+				}
+			}
 		}
 	}
 
 	return direction;
 }
 
-//
+void init_mat_voisin_lab(labyrinthe_t * labyrinthe){
+	int i;
+	int noeud1, noeud2;
+
+	for(i=0; i<labyrinthe->graph_lab.nbr_arretes; i++){
+		noeud1 = labyrinthe->graph_lab.table_arretes[i].noeud1;
+		noeud2 = labyrinthe->graph_lab.table_arretes[i].noeud2;
+
+		//printf("Noeuds : %d , %d \n", noeud1, noeud2);
+
+		labyrinthe->matrice_voisins[noeud1] += direction_labyrinthe(noeud1, noeud2, labyrinthe->largeur);
+		labyrinthe->matrice_voisins[noeud2] += direction_labyrinthe(noeud2, noeud1, labyrinthe->largeur);
+
+		//printf("Voisins : %d , %d \n", labyrinthe->matrice_voisins[noeud1], labyrinthe->matrice_voisins[noeud2]);
+	}
+
+}
+
 labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 	labyrinthe_t labyrinthe;
 	graphe_t retour;
@@ -61,14 +79,17 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 	labyrinthe.hauteur = hauteur;
 	labyrinthe.largeur = largeur;
 
-	labyrinthe.matrice_voisins = NULL;//(int *) malloc(sizeof(int) * hauteur * largeur);
+	labyrinthe.matrice_voisins = (int *) malloc(sizeof(int) * hauteur * largeur);
 
-	//if(labyrinthe.matrice_voisins != NULL){
+	for(i=0; i<hauteur*largeur; i++){
+		labyrinthe.matrice_voisins[i] = 0; 
+	}
+
+	if(labyrinthe.matrice_voisins != NULL){
 		for(i=0; i<hauteur; i++){
 			for(j=0; j<largeur; j++){
 				if(i+1 < hauteur)
 					ajouter_arrete_graphe(i*largeur+j, (i+1)*largeur+j, &(labyrinthe.graph_lab));
-
 				
 				if(j+1 < largeur)
 					ajouter_arrete_graphe(i*largeur+j, i*largeur+j+1, &(labyrinthe.graph_lab));
@@ -80,18 +101,19 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 		
 		//attention fuite de memoire !!!!
 		labyrinthe.graph_lab = retour;
-	/*}
+
+		init_mat_voisin_lab(&labyrinthe);
+
+	}
 	else{
 		labyrinthe.hauteur = 0;
 		labyrinthe.largeur = 0;
-	}*/
-
-	printf("%d, %d\n", labyrinthe.hauteur, labyrinthe.largeur);
+	}
 
 	return labyrinthe;
 }
 
-void afficher_labyrinthe(SDL_Window * window, SDL_Renderer * renderer, labyrinthe_t labyrinthe){
+void afficher_labyrinthe_NB(SDL_Window * window, SDL_Renderer * renderer, labyrinthe_t labyrinthe){
 	int i, noeud1, noeud2;
 	int case_w, case_h;
 
@@ -139,14 +161,117 @@ void afficher_labyrinthe(SDL_Window * window, SDL_Renderer * renderer, labyrinth
 		}
 
 		SDL_RenderFillRect(renderer, &rect1);
+	}
+}
+
+void afficher_texture_labyrinthe(SDL_Window * window, SDL_Texture * texture, SDL_Renderer * renderer, labyrinthe_t labyrinthe){
+	int i;
+
+	SDL_Rect 	source = {0},
+				window_dimension = {0},
+				destination = {0};
+
+	SDL_GetWindowSize(window, &window_dimension.w, &window_dimension.h);
+	SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
+
+	source.h = source.h/8;
+	source.w = source.w/12;
+
+	destination.h = window_dimension.h/labyrinthe.hauteur;
+	destination.w = window_dimension.w/labyrinthe.largeur;
+
+	//1:N ; 2:S ; 4:E ; 8:O
+	for(i=0; i<labyrinthe.hauteur * labyrinthe.largeur; i++){
+		destination.x = i%labyrinthe.largeur * destination.w;
+		destination.y = i/labyrinthe.largeur * destination.h;
+
+		switch(labyrinthe.matrice_voisins[i]){
+
+		//cul de sac
+		case 1:
+			source.x = 9*source.w;
+			source.y = 2*source.h;
+			break;
+
+		case 2:
+			source.x = 8*source.w;
+			source.y = 2*source.h;
+			break;
+
+		case 4:
+			source.x = 8*source.w;
+			source.y = 3*source.h;			
+			break;
+
+		case 8:
+			source.x = 9*source.w;
+			source.y = 3*source.h;
+			break;
 		
+		//2 directions
+		case 3:
+			source.x = 0*source.w;
+			source.y = 0*source.h;
+			break;
 
-		/*x1 = noeud1%10 * 108;
-		y1 = noeud1/10 * 72;
+		case 5:
+			source.x = 5*source.w;
+			source.y = 1*source.h;
+			break;
 
-		x2 = noeud2%10 * 108 ;
-		y2 = noeud2/10 * 72;*/
+		case 9:
+			source.x = 6*source.w;
+			source.y = 1*source.h;
+			break;
 
-		//SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+		case 6:
+			source.x = 5*source.w;
+			source.y = 0*source.h;
+			break;
+
+		case 10:
+			source.x = 6*source.w;
+			source.y = 0*source.h;
+			break;
+
+		case 12:
+			source.x = 0*source.w;
+			source.y = 1*source.h;
+			break;
+		
+		//Les T
+		case 7:
+			source.x = 4*source.w;
+			source.y = 2*source.h;
+			break;
+
+		case 11:
+			source.x = 5*source.w;
+			source.y = 2*source.h;
+			break;
+
+		case 13:
+			source.x = 4*source.w;
+			source.y = 3*source.h;
+			break;
+
+		case 14:
+			source.x = 5*source.w;
+			source.y = 3*source.h;
+			break;
+
+		//Les quatre directions
+		case 15:
+			source.x = 9*source.w;
+			source.y = 0*source.h;
+			break;
+		
+		default:
+			source.x = 0*source.w;
+			source.y = 2*source.h;
+			break;
+		}
+
+		SDL_RenderCopy(renderer, texture, &source, &destination);
 	}
 }

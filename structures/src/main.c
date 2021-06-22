@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "tas.h"
 #include "partition.h"
 #include "liste.h"
@@ -11,6 +12,7 @@ int main(){
 	srand(10);
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL; 
+	SDL_Texture * bg_texture = NULL;
 
 	SDL_Event event;
 	SDL_Rect rect;
@@ -38,7 +40,19 @@ int main(){
 			exit(EXIT_FAILURE);
 		}
 
-		labyrinthe_t labyrinthe = init_labyrinthe(10, 15);
+		bg_texture = IMG_LoadTexture(renderer, "./images/roadTextures_tilesheet@2.png");
+		if(bg_texture == NULL){
+			SDL_DestroyRenderer(renderer);
+			SDL_DestroyWindow(window);
+			SDL_Quit();
+			exit(EXIT_FAILURE);
+		}
+
+		labyrinthe_t labyrinthe = init_labyrinthe(100, 150);
+
+		/*for(int i = 0; i<labyrinthe.hauteur*labyrinthe.largeur; i++){
+			printf("%d ", labyrinthe.matrice_voisins[i]);
+		}*/
 
 		while (!quit){
 			SDL_PollEvent(&event);
@@ -49,7 +63,8 @@ int main(){
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 			SDL_RenderFillRect(renderer, &rect);
 
-			afficher_labyrinthe(window ,renderer, labyrinthe);
+			//afficher_labyrinthe_NB(window, renderer, labyrinthe);
+			afficher_texture_labyrinthe(window, bg_texture ,renderer, labyrinthe);
 
 			SDL_RenderPresent(renderer);
     	}

@@ -11,6 +11,7 @@ typedef struct labyrinthe_c{
 }labyrinthe_t;
 
 labyrinthe_t init_labyrinthe(int hauteur, int largeur);
-void afficher_labyrinthe(SDL_Window * , SDL_Renderer * , labyrinthe_t);
+void afficher_labyrinthe_NB(SDL_Window * , SDL_Renderer * , labyrinthe_t);
+void afficher_texture_labyrinthe(SDL_Window * , SDL_Texture * , SDL_Renderer * , labyrinthe_t );
 
 #endif
