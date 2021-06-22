@@ -14,4 +14,7 @@ typedef struct graphe_c{
 	arrete_t * table_arretes;
 }graphe_t;
 
+graphe_t init_graphe();
+void ajouter_noeud_graphe(int, graphe_t *);
+
 #endif

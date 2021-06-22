@@ -2,6 +2,7 @@
 #include "tas.h"
 #include "partition.h"
 #include "liste.h"
+#include "graphe.h"
 
 int main(){	
 	/*data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
@@ -11,7 +12,7 @@ int main(){
 		printf("%d\n", tab[i]);
 	}*/
 	
-	liste_t ** liste = NULL;
+	/*liste_t ** liste = NULL;
 	partition_t partition;
 	partition = init_partition(11);
 
@@ -28,9 +29,12 @@ int main(){
 	afficher_table_partition(liste, partition.taille);
 
 	liberer_table_partition(&liste, partition.taille);
-	liberer_partition(&partition);
+	liberer_partition(&partition);*/
 
 	//creer_affichage_partition(partition);
+
+	graphe_t graphe = init_graphe(11);
+	
 
 	return 0;
 }
