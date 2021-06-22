@@ -26,13 +26,17 @@ int main()
 	liberer_partition(&part);
 	*/
 	srand(2);
-	graphe_t graphe = creer_graphe(10, 7);
+	graphe_t graphe = creer_graphe(10);
 	init_graph(&graphe);
-	afficher_graphe(graphe);
+	afficher_graphe(graphe, "./file/aff_graphe.dot");
+	/*
 	part_t part  = graphe_part(graphe);
 	compo_connexe(part, graphe, 5);
-
-
+	*/
+	
+	graphe_t arbre = kruskal(graphe);
+	printf("aaf %d\n",arbre.tab_arretes[4].b);
+	afficher_graphe(arbre, "./file/aff_arbre.dot");
 
 
 	return 0;

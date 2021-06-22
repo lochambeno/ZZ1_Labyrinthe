@@ -21,14 +21,14 @@ typedef struct graphe_c{
 
 }graphe_t;
 
-graphe_t creer_graphe(int , int);
+graphe_t creer_graphe(int);
 void creer_arrete(graphe_t* , int , int);
 void init_graph(graphe_t*);
-void afficher_graphe(graphe_t);
+void afficher_graphe(graphe_t, char*);
 part_t graphe_part(graphe_t);
 int in_liste(liste_t , int);
 void compo_connexe(part_t , graphe_t , int);
-
+graphe_t kruskal(graphe_t);
 
 
 #endif
