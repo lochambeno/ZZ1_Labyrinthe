@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "partition.h"
+#include "liste.h"
 
 int ** init_matrice_adjacence(int n){
 	int ** matrice = NULL;
@@ -57,13 +59,35 @@ void creer_affichage_matrice(int ** matrice, int n){
 	}
 }
 
+partition_t composante_connexe_matrice(int ** matrice, int taille){
+	int i, j;
+	partition_t partition = init_partition(taille);
+	liste_t ** table_classe = NULL;
 
+	for(i=0; i<taille; i++){
+		for(j=i+1; j<taille; j++){
+			if(matrice[i][j] == 1){
+				fusion_partition(i, j, &partition);
+			}
+		}
+	}
+
+	table_classe = liste_classes_partition(partition);
+	afficher_table_partition(table_classe, taille);
+	liberer_table_partition(&table_classe, taille);
+
+	return partition;
+}
 
 int main(){
 	srand(1);
 
+	partition_t partition;
 	int ** matrice = init_matrice_adjacence(10);
 	creer_affichage_matrice(matrice, 10);
+
+	partition = composante_connexe_matrice(matrice, 10);
+	creer_affichage_partition(partition);
 
 	return 0;
 }
