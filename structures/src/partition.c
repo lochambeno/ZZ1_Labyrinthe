@@ -75,17 +75,20 @@ void fusion_part(part_t* p_part, int x, int y)
 {
     x = recuperer_classe(*p_part, x);
     y = recuperer_classe(*p_part, y);
-    if(p_part->hauteur[x] > p_part->hauteur[y])
+    if(x != y)
     {
-        p_part->parent[y] = x;
-    }
-    else
-    {
-        if(p_part->hauteur[x] < p_part->hauteur[y]) p_part->parent[x] = y;
-        else 
+        if(p_part->hauteur[x] > p_part->hauteur[y])
         {
             p_part->parent[y] = x;
-            p_part->hauteur[x]++;
+        }
+        else
+        {
+            if(p_part->hauteur[x] < p_part->hauteur[y]) p_part->parent[x] = y;
+            else 
+            {
+                p_part->parent[y] = x;
+                p_part->hauteur[x]++;
+            }
         }
     }
 }

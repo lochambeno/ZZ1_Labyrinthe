@@ -1,10 +1,13 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
 LFLAGS=
-OBJ= build/partition.o build/main.o build/liste.o
+OBJ= build/partition.o build/main.o build/liste.o build/graphe.o
 
 prog:$(OBJ)
 	$(CC) $^ -o $@ 
+
+build/graphe.o:src/graphe.c src/graphe.h
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/liste.o:src/liste.c src/liste.h
 	$(CC) $(CFLAGS) -c -o $@ $<

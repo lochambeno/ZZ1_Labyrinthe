@@ -1,5 +1,5 @@
-#ifndef ZZ1_PROJET_TAS_H
-#define ZZ1_PROJET_TAS_H
+#ifndef ZZ1_PROJET_PART_H
+#define ZZ1_PROJET_PART_H
 
 #include "liste.h"
 

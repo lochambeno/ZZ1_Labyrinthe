@@ -1,8 +1,11 @@
-#include "partition.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "graphe.h"
+#include "partition.h"
+
 
 int main()
-{	
+{	/*
 	part_t part = init_part(11);
 
 	fusion_part(&part, 0, 1);
@@ -21,6 +24,15 @@ int main()
 
 	liberer_classes(liste, part.taille);
 	liberer_partition(&part);
+	*/
+	srand(2);
+	graphe_t graphe = creer_graphe(10, 7);
+	init_graph(&graphe);
+	afficher_graphe(graphe);
+	part_t part  = graphe_part(graphe);
+	compo_connexe(part, graphe, 5);
+
+
 
 
 	return 0;

@@ -22,12 +22,12 @@ liste_t * creer_liste()
 
 void liberer_liste(liste_t *l)
 {
-    liste_t *cour = l, *temp;
+    liste_t *cour = l, *temp = NULL;
     while (cour != NULL)
     {      
-        temp = cour->suivant;
-        free(cour);
-        cour = temp;
+        temp = cour;
+        cour = cour->suivant;
+        free(temp);
     }
 }
 
