@@ -3,8 +3,14 @@
 
 #include "graphe.h"
 
-typedef graphe_t labyrinthe_t;
+typedef struct labyrinthe_c{
+	graphe_t graph_lab;
+	int * matrice_voisins;
+	int hauteur;
+	int largeur;
+}labyrinthe_t;
 
 labyrinthe_t init_labyrinthe(int hauteur, int largeur);
+void afficher_labyrinthe(SDL_Window * , SDL_Renderer * , labyrinthe_t);
 
 #endif
