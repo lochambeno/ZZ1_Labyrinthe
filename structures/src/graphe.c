@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graphe.h"
-#include "partition.h"
 
 //il faut verifier la taille du graphe ou le tableau apres initialisation
 graphe_t init_graphe(int nbr_noeuds){
@@ -86,7 +85,63 @@ graphe_t graphe_aleatoire(int taille, int nbr_arrete){
 
 	return graphe;
 }
-/*
-partition_t composantes_connexes(graphe_t graphe){
 
-}*/
+partition_t composantes_connexes(graphe_t graphe){
+	partition_t partition = init_partition(graphe.nbr_noeuds);
+	int i;
+	arrete_t arrete;
+	
+	for(i=0; i<graphe.nbr_arretes; i++){
+		arrete = graphe.table_arretes[i];
+		fusion_partition(arrete.noeud1, arrete.noeud2, &partition);
+	}
+
+	return partition;
+}
+
+void sous_graphe_composante_connexe(graphe_t graphe, int noeud){
+	//tableau permettant de stocker les arretes a afficher
+	int nbr_arrete = 0;
+	arrete_t * a_afficher = (arrete_t*) malloc(graphe.nbr_arretes * sizeof(arrete_t));
+	//la partition permet de calculer les composantes connexes et d'avoir
+	//acces aux noeuds dans une liste chainee
+	partition_t cc = composantes_connexes(graphe);
+	liste_t ** liste_classe = liste_classes_partition(cc);
+	
+	int classe_noeud = classe_element_partition(noeud, cc);
+
+	int i;
+	liste_t * cour = NULL;
+	FILE * fichier_dot = NULL;
+
+	//pour chaque arrete, on regarde si l'un des noeuds est dans la composante connexe
+	if(a_afficher != NULL){
+		for(i=0; i<graphe.nbr_arretes; i++){
+			cour = liste_classe[classe_noeud];
+			while(cour != NULL 	&& cour->val != graphe.table_arretes[i].noeud1){
+				cour = cour->suiv;
+			}
+
+			if(cour != NULL){
+				a_afficher[nbr_arrete] = graphe.table_arretes[i];
+				nbr_arrete++;
+			}
+		}
+	
+
+		//creation du fichier .dot
+		fichier_dot = fopen("./files/sous_graphe.dot", "w+");
+		fprintf(fichier_dot, "graph {\n");
+
+		for(i=0; i<nbr_arrete; i++){
+			fprintf(fichier_dot, "\t%d -- %d;\n", a_afficher[i].noeud1, a_afficher[i].noeud2);
+		}
+
+		fprintf(fichier_dot, "}");
+		fclose(fichier_dot);
+		free(a_afficher);
+	}
+	//liberation
+	liberer_table_partition(&liste_classe, cc.taille);
+	liberer_partition(&cc);
+}

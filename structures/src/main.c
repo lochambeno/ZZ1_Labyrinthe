@@ -36,8 +36,12 @@ int main(){
 
 	//creer_affichage_partition(partition);
 
-	graphe_t graphe = graphe_aleatoire(11, 11);
-	affichage_graphe(graphe);
+	/*graphe_t graphe = graphe_aleatoire(11, 11);
+	partition_t partition = composantes_connexes(graphe);
+	afficher_table_partition(liste_classes_partition(partition), 11);
+
+	sous_graphe_composante_connexe(graphe, 0);*/
+	//affichage_graphe(graphe);
 
 	return 0;
 }

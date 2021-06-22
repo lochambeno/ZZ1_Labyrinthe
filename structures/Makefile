@@ -31,3 +31,7 @@ afficher :
 afficher_graphe :
 	dot -Tpng files/graphe.dot -o files/graphe.png
 	open files/graphe.png
+
+afficher_cc :
+	dot -Tpng files/sous_graphe.dot -o files/sous_graphe.png
+	open files/sous_graphe.png
