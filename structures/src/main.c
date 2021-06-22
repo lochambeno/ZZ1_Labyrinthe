@@ -4,11 +4,18 @@
 #include "partition.h"
 #include "liste.h"
 #include "graphe.h"
+#include "labyrinthe.h"
 
 int main(){	
 	srand(1);
 
-	/*data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
+	labyrinthe_t labyrinthe = init_labyrinthe(10, 10);
+	affichage_graphe(labyrinthe, "./files/labyrinthe.dot");
+
+	return 0;
+}
+
+/*data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
 
 	tri_tas(&tab, 9);
 	for(int i=0; i<9; i++){
@@ -36,12 +43,8 @@ int main(){
 
 	//creer_affichage_partition(partition);
 
-	/*graphe_t graphe = graphe_aleatoire(11, 11);
-	partition_t partition = composantes_connexes(graphe);
-	afficher_table_partition(liste_classes_partition(partition), 11);
+	/*graphe_t graphe = graphe_aleatoire(20, 30);
+	graphe_t arbre_couv = kruskal(graphe);
 
-	sous_graphe_composante_connexe(graphe, 0);*/
-	//affichage_graphe(graphe);
-
-	return 0;
-}
+	affichage_graphe(graphe, "./files/graphe.dot");
+	affichage_graphe(arbre_couv, "./files/arbre_cou.dot");*/

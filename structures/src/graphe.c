@@ -54,12 +54,12 @@ void ajouter_arrete_graphe(int noeud1, int noeud2, graphe_t * graphe){
 	}
 }
 
-void affichage_graphe(graphe_t graphe){
+void affichage_graphe(graphe_t graphe, char* adresse){
 	int i;
 	arrete_t arrete;
 	FILE * fichier_dot = NULL;
 
-	fichier_dot = fopen("./files/graphe.dot", "w+");
+	fichier_dot = fopen(adresse, "w+");
 	fprintf(fichier_dot, "graph {\n");
 
 	for(i=0; i<graphe.nbr_noeuds; i++){
@@ -144,4 +144,24 @@ void sous_graphe_composante_connexe(graphe_t graphe, int noeud){
 	//liberation
 	liberer_table_partition(&liste_classe, cc.taille);
 	liberer_partition(&cc);
+}
+
+graphe_t kruskal(graphe_t graphe){
+	graphe_t arbre_cou = init_graphe(graphe.nbr_noeuds);
+	partition_t partition = init_partition(graphe.nbr_noeuds);
+	int i;
+	int noeud1, noeud2;
+
+	for(i=0; i<graphe.nbr_arretes; i++){
+		noeud1 = graphe.table_arretes[i].noeud1;
+		noeud2 = graphe.table_arretes[i].noeud2;
+
+		if(classe_element_partition(noeud1, partition) !=
+			classe_element_partition(noeud2, partition)){
+			
+			fusion_partition(noeud1, noeud2, &partition);
+			ajouter_arrete_graphe(noeud1, noeud2, &arbre_cou);
+		}
+	}
+	return arbre_cou;
 }

@@ -1,10 +1,13 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
 LDFLAGS=
-OBJ= build/tas.o build/main.o build/partition.o build/liste.o build/graphe.o
+OBJ= build/tas.o build/main.o build/partition.o build/liste.o build/graphe.o build/labyrinthe.o
 
 prog:$(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
+
+build/labyrinthe.o:src/labyrinthe.c src/labyrinthe.h src/graphe.h
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/graphe.o:src/graphe.c src/graphe.h
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -35,3 +38,7 @@ afficher_graphe :
 afficher_cc :
 	dot -Tpng files/sous_graphe.dot -o files/sous_graphe.png
 	open files/sous_graphe.png
+
+afficher_lab :
+	dot -Tpng files/labyrinthe.dot -o files/labyrinthe.png
+	open files/labyrinthe.png

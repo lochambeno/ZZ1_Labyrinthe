@@ -16,10 +16,10 @@ typedef struct graphe_c{
 	arrete_t * table_arretes;
 }graphe_t;
 
-graphe_t init_graphe();
+graphe_t init_graphe(int);
 void ajouter_noeud_graphe(int, graphe_t *);
 void ajouter_arrete_graphe(int, int, graphe_t *);
-void affichage_graphe(graphe_t);
+void affichage_graphe(graphe_t, char*);
 graphe_t graphe_aleatoire(int , int );
 partition_t composantes_connexes(graphe_t);
 
