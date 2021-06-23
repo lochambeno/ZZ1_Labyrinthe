@@ -128,6 +128,7 @@ void liberer_tableau_classe(classe_t* tableau_classe, int taille) {
     for (i=0;i<taille;++i) {
         free(tableau_classe[i].liste);
     }
+    free(tableau_classe);
 }
 
 void afficher_part(part_t part) {

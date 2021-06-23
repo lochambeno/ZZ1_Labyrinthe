@@ -39,20 +39,21 @@ int main() {
     
     part_t comp_connexe=graphe_comp_connexe(graphe);
     afficher_part(comp_connexe);
-    /*
+    
     classe_t classe = lister_classe(comp_connexe,0);
     afficher_classe(classe);
     liberer_classe(classe);
-    */
-    /*
+    
+    
     classe_t* classes = lister_partition(comp_connexe);
     afficher_tableau_classe(classes,taille);
-    liberer_tableau_classe(&classe,taille);
-    */
+    
 
     //afficher_graphe_comp_connexe(graphe, 0);
-    lister_partition(comp_connexe);
-    //liberer_part(comp_connexe);
+    
+
+    liberer_tableau_classe(classes,taille);
+    liberer_part(comp_connexe);
     liberer_graphe(&graphe);
     return 0;
 }
