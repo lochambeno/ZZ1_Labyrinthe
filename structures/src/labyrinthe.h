@@ -21,6 +21,8 @@ void afficher_labyrinthe_NB(SDL_Window * , SDL_Renderer * , labyrinthe_t);
 void afficher_texture_labyrinthe(SDL_Window * , SDL_Texture * , SDL_Renderer * , labyrinthe_t );
 void liberer_labyrinthe(labyrinthe_t * labyrinthe);
 
-noeud_t * dijkstra(labyrinthe_t labyrinthe, int departt);
+noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart);
+void ecrire_chemin_court(noeud_t * table_noeud, int depart, int destination);
+liste_t * liste_chemin_court(noeud_t * table_noeud, int depart, int destination);
 
 #endif

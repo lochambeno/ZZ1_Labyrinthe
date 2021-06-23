@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include "labyrinthe.h"
 #include "tas_noeuds.h"
+#include "liste.h"
 
 #define MAX_I 2147483647
 
@@ -366,12 +367,14 @@ void ajout_noeuds_tas(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas){
 	}
 }
 
+//ON SUPPOSE QUE C'EST CONNEXE
 //noeuds dans le tas : (-1 : pas decouvert ; -2 : explore ; sinon index)
 noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart){
 	tas_t tas = init_tas(10);
 	int * noeuds_tas = NULL;
 
 	noeud_t a_traite;
+	noeud_t en_traitement;
 	noeud_t * table_noeuds = NULL;
 
 	int nbr_traites = 0, 
@@ -394,15 +397,39 @@ noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart){
 		inserer_tas(&tas, a_traite, &noeuds_tas);
 
 		while(nbr_traites < taille){
-			table_noeuds[nbr_traites] = *sommet_tas(&tas);
-			
+			en_traitement = *sommet_tas(&tas);
+			table_noeuds[en_traitement.id_noeud] = en_traitement;
 			//ajoute les noeuds dans le tas 
 			ajout_noeuds_tas(labyrinthe, &tas, &noeuds_tas);
-
-			//on l'insere dans la table des noeuds a son adresse
-			
+	
+			//on a traite un noeud en plus
+			nbr_traites++;
 		}
 	}
-
+	liberer_tas(&tas);
+	free(noeuds_tas);
 	return table_noeuds;
+}
+
+liste_t * liste_chemin_court(noeud_t * table_noeud, int depart, int destination){
+	int num_noeud = destination;
+	liste_t * liste = creer_liste();
+
+	while(num_noeud != depart){
+		insertion(&liste, num_noeud);
+		num_noeud = table_noeud[num_noeud].parent;
+	}
+
+	return liste;
+}
+
+void ecrire_chemin_court(noeud_t * table_noeud, int depart, int destination){
+	int num_noeud = destination;
+
+	while(num_noeud != depart){
+		printf("%d ; ", num_noeud);
+		num_noeud = table_noeud[num_noeud].parent;
+	}
+
+	printf("\n");
 }

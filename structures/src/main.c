@@ -19,6 +19,7 @@ int main(){
 
 	labyrinthe_t labyrinthe = init_labyrinthe(20, 30);
 	int quit = 0;
+	noeud_t * table_noeud = NULL;
 
 	//Initialisation de la SDL2
 	if (SDL_Init(SDL_INIT_VIDEO) == 0){
@@ -63,6 +64,9 @@ int main(){
 			SDL_RenderPresent(renderer);
     	}
 	}
+
+	table_noeud = dijkstra(labyrinthe, 0);
+	afficher_liste(liste_chemin_court(table_noeud, 0, 1000));
 
 	liberer_labyrinthe(&labyrinthe);
 
