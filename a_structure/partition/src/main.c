@@ -57,13 +57,17 @@ int main() {
     graphe_t arbre_couvrant = kruskal(graphe);
     afficher_arbre_couvrant(arbre_couvrant);
     */
-    laby_t labyrinthe = init_laby(10, 10);
-    afficher_graphe(labyrinthe.graphe);
-    labyrinthe.graphe = kruskal(labyrinthe.graphe);
+    laby_t grille = init_laby(3, 3), labyrinthe;
+    afficher_graphe(grille.graphe);
+    labyrinthe.graphe = kruskal(grille.graphe);
     afficher_arbre_couvrant(labyrinthe.graphe);
+    init_carac_laby(&labyrinthe);
+    afficher_carac(labyrinthe);
+
     //liberer_tableau_classe(classes,taille);
     //liberer_part(comp_connexe);
-    //liberer_graphe(&arbre_couvrant);
-    liberer_graphe(&labyrinthe.graphe);
+    liberer_graphe(&grille.graphe);
+    //liberer_graphe(&labyrinthe.graphe);
+    liberer_labyrinthe(&labyrinthe);
     return 0;
 }

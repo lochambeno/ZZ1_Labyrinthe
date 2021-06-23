@@ -17,5 +17,8 @@ typedef struct laby_c {
 } laby_t;
 
 laby_t init_laby(int, int);
+void init_carac_laby(laby_t*);
+void afficher_carac(laby_t);
+void liberer_labyrinthe(laby_t*);
 
 #endif
