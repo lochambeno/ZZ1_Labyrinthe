@@ -55,7 +55,7 @@ void fusion_partition(int el1, int el2, partition_t * partition){
 		}
 		else{
 			partition->parent[classe1] = classe2;
-			partition->hauteur[classe2] += 1;
+			//partition->hauteur[classe2] += 1;
 		}
 	}
 }

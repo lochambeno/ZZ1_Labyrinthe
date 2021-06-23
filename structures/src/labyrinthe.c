@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "labyrinthe.h"
+#include "tas_noeuds.h"
+
+#define MAX_I 2147483647
 
 //melange les arretes d'un labyrinthe
 // A REFAIRE
@@ -62,8 +65,8 @@ void init_mat_voisin_lab(labyrinthe_t * labyrinthe){
 
 		//printf("Noeuds : %d , %d \n", noeud1, noeud2);
 
-		labyrinthe->matrice_voisins[noeud1] += direction_labyrinthe(noeud1, noeud2, labyrinthe->largeur);
-		labyrinthe->matrice_voisins[noeud2] += direction_labyrinthe(noeud2, noeud1, labyrinthe->largeur);
+		labyrinthe->matrice_voisins[noeud1].direction += direction_labyrinthe(noeud1, noeud2, labyrinthe->largeur);
+		labyrinthe->matrice_voisins[noeud2].direction += direction_labyrinthe(noeud2, noeud1, labyrinthe->largeur);
 
 		//printf("Voisins : %d , %d \n", labyrinthe->matrice_voisins[noeud1], labyrinthe->matrice_voisins[noeud2]);
 	}
@@ -79,10 +82,11 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 	labyrinthe.hauteur = hauteur;
 	labyrinthe.largeur = largeur;
 
-	labyrinthe.matrice_voisins = (int *) malloc(sizeof(int) * hauteur * largeur);
+	labyrinthe.matrice_voisins = (case_t *) malloc(sizeof(case_t) * hauteur * largeur);
 
 	for(i=0; i<hauteur*largeur; i++){
-		labyrinthe.matrice_voisins[i] = 0; 
+		labyrinthe.matrice_voisins[i].poids = 1;
+		labyrinthe.matrice_voisins[i].direction = 0;
 	}
 
 	if(labyrinthe.matrice_voisins != NULL){
@@ -99,7 +103,7 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 		fisher_yate(&labyrinthe);
 		retour = kruskal(labyrinthe.graph_lab);
 		
-		//attention fuite de memoire !!!!
+		liberer_graphe(&(labyrinthe.graph_lab));
 		labyrinthe.graph_lab = retour;
 
 		init_mat_voisin_lab(&labyrinthe);
@@ -185,7 +189,7 @@ void afficher_texture_labyrinthe(SDL_Window * window, SDL_Texture * texture, SDL
 		destination.x = i%labyrinthe.largeur * destination.w;
 		destination.y = i/labyrinthe.largeur * destination.h;
 
-		switch(labyrinthe.matrice_voisins[i]){
+		switch(labyrinthe.matrice_voisins[i].direction){
 
 		//cul de sac
 		case 1:
@@ -281,4 +285,124 @@ void liberer_labyrinthe(labyrinthe_t * labyrinthe){
 	free(labyrinthe->matrice_voisins);
 	labyrinthe->hauteur = 0;
 	labyrinthe->largeur = 0;
+}
+
+void modifier_tas_lab(noeud_t nouveau_noeud, tas_t * tas, int ** noeuds_tas){
+	int i = (*noeuds_tas)[nouveau_noeud.id_noeud];
+
+	tas->tas[i].parent = nouveau_noeud.parent;
+	tas->tas[i].poids = nouveau_noeud.poids;
+
+	while(tas->tas[i].poids < tas->tas[parent(i)].poids){
+			echange(&(tas->tas[i]), &(tas->tas[parent(i)]));
+
+			(*noeuds_tas)[tas->tas[i].id_noeud] = parent(i);
+			(*noeuds_tas)[tas->tas[parent(i)].id_noeud] = i;
+
+			i = parent(i);
+	}
+}
+
+//recupere le noeud au dessus du tas et ajoute les noeuds qui lui sont
+//adjacent
+void ajout_noeuds_tas(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas){
+	noeud_t a_traite = *sommet_tas(tas);
+	noeud_t a_inserer;
+	int direction = labyrinthe.matrice_voisins[a_traite.id_noeud].direction;
+
+	supprimer_tas(tas, noeuds_tas);
+
+	//1:N ; 2:S ; 4:E ; 8:O
+	if(direction & 1){
+		a_inserer.id_noeud = a_traite.id_noeud - labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = a_traite.poids + labyrinthe.matrice_voisins[a_inserer.id_noeud].poids;
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 2){
+		a_inserer.id_noeud = a_traite.id_noeud + labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = a_traite.poids + labyrinthe.matrice_voisins[a_inserer.id_noeud].poids;
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 4){
+		a_inserer.id_noeud = a_traite.id_noeud + 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = a_traite.poids + labyrinthe.matrice_voisins[a_inserer.id_noeud].poids;
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 8){
+		a_inserer.id_noeud = a_traite.id_noeud - 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = a_traite.poids + labyrinthe.matrice_voisins[a_inserer.id_noeud].poids;
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+}
+
+//noeuds dans le tas : (-1 : pas decouvert ; -2 : explore ; sinon index)
+noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart){
+	tas_t tas = init_tas(10);
+	int * noeuds_tas = NULL;
+
+	noeud_t a_traite;
+	noeud_t * table_noeuds = NULL;
+
+	int nbr_traites = 0, 
+		i,
+		taille = labyrinthe.hauteur * labyrinthe.largeur;
+
+	noeuds_tas = (int*) malloc(sizeof(int) * taille);
+	table_noeuds = (noeud_t*) malloc(sizeof(noeud_t) * taille);
+
+	if(noeuds_tas != NULL && table_noeuds != NULL){
+		//initialisation de la matrice et du tas
+		for(i=0; i<taille; i++){
+			noeuds_tas[i] = -1;
+		}
+		
+		a_traite.id_noeud = depart;
+		a_traite.parent = depart;
+		a_traite.poids = 0;
+
+		inserer_tas(&tas, a_traite, &noeuds_tas);
+
+		while(nbr_traites < taille){
+			table_noeuds[nbr_traites] = *sommet_tas(&tas);
+			
+			//ajoute les noeuds dans le tas 
+			ajout_noeuds_tas(labyrinthe, &tas, &noeuds_tas);
+
+			//on l'insere dans la table des noeuds a son adresse
+			
+		}
+	}
+
+	return table_noeuds;
 }

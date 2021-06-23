@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "tas.h"
+#include "tas_noeuds.h"
 #include "partition.h"
 #include "liste.h"
 #include "graphe.h"
 #include "labyrinthe.h"
 
 int main(){	
-	srand(10);
+	srand(1);
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL; 
 	SDL_Texture * bg_texture = NULL;
