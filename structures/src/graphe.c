@@ -24,7 +24,7 @@ void ajouter_noeud_graphe(int nbr_noeuds, graphe_t * graphe){
 	graphe->nbr_noeuds += nbr_noeuds;
 }
 
-void ajouter_arrete_graphe(int noeud1, int noeud2, graphe_t * graphe){
+void ajouter_arrete_graphe(int noeud1, int noeud2, int poids, graphe_t * graphe){
 	int nouvelle_taille;
 	arrete_t * temp = NULL;
 
@@ -47,6 +47,7 @@ void ajouter_arrete_graphe(int noeud1, int noeud2, graphe_t * graphe){
 		if(graphe->nbr_arretes < graphe->taille){
 			arrete.noeud1 = noeud1;
 			arrete.noeud2 = noeud2;
+			arrete.poids = poids;
 			
 			graphe->table_arretes[graphe->nbr_arretes] = arrete;
 			graphe->nbr_arretes += 1;
@@ -80,7 +81,7 @@ graphe_t graphe_aleatoire(int taille, int nbr_arrete){
 	graphe_t graphe = init_graphe(taille);
 
 	for(i=0; i<nbr_arrete; i++){
-		ajouter_arrete_graphe(rand()%taille, rand()%taille, &graphe);
+		ajouter_arrete_graphe(rand()%taille, rand()%taille, 1, &graphe);
 	}
 
 	return graphe;
@@ -150,18 +151,26 @@ graphe_t kruskal(graphe_t graphe){
 	graphe_t arbre_cou = init_graphe(graphe.nbr_noeuds);
 	partition_t partition = init_partition(graphe.nbr_noeuds);
 	int i;
-	int noeud1, noeud2;
+	int noeud1, noeud2, poids;
 
 	for(i=0; i<graphe.nbr_arretes; i++){
 		noeud1 = graphe.table_arretes[i].noeud1;
 		noeud2 = graphe.table_arretes[i].noeud2;
+		poids = graphe.table_arretes[i].poids;
 
 		if(classe_element_partition(noeud1, partition) !=
 			classe_element_partition(noeud2, partition)){
 			
 			fusion_partition(noeud1, noeud2, &partition);
-			ajouter_arrete_graphe(noeud1, noeud2, &arbre_cou);
+			ajouter_arrete_graphe(noeud1, noeud2, poids, &arbre_cou);
 		}
 	}
 	return arbre_cou;
+}
+
+void liberer_graphe(graphe_t * graphe){
+	free(graphe->table_arretes);
+	graphe->nbr_arretes = 0;
+	graphe->nbr_noeuds = 0;
+	graphe->taille = 0;
 }

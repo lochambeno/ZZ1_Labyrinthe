@@ -89,10 +89,10 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 		for(i=0; i<hauteur; i++){
 			for(j=0; j<largeur; j++){
 				if(i+1 < hauteur)
-					ajouter_arrete_graphe(i*largeur+j, (i+1)*largeur+j, &(labyrinthe.graph_lab));
+					ajouter_arrete_graphe(i*largeur+j, (i+1)*largeur+j, 1, &(labyrinthe.graph_lab));
 				
 				if(j+1 < largeur)
-					ajouter_arrete_graphe(i*largeur+j, i*largeur+j+1, &(labyrinthe.graph_lab));
+					ajouter_arrete_graphe(i*largeur+j, i*largeur+j+1, 1, &(labyrinthe.graph_lab));
 			}
 		}
 
@@ -274,4 +274,11 @@ void afficher_texture_labyrinthe(SDL_Window * window, SDL_Texture * texture, SDL
 
 		SDL_RenderCopy(renderer, texture, &source, &destination);
 	}
+}
+
+void liberer_labyrinthe(labyrinthe_t * labyrinthe){
+	liberer_graphe(&(labyrinthe->graph_lab));
+	free(labyrinthe->matrice_voisins);
+	labyrinthe->hauteur = 0;
+	labyrinthe->largeur = 0;
 }

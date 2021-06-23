@@ -15,10 +15,12 @@ int main(){
 	SDL_Texture * bg_texture = NULL;
 
 	SDL_Event event;
-	SDL_Rect rect;
+	//SDL_Rect rect;
 
+	labyrinthe_t labyrinthe = init_labyrinthe(20, 30);
 	int quit = 0;
 
+	//Initialisation de la SDL2
 	if (SDL_Init(SDL_INIT_VIDEO) == 0){
 
 		window = SDL_CreateWindow("Labyrinthe",
@@ -48,63 +50,27 @@ int main(){
 			exit(EXIT_FAILURE);
 		}
 
-		labyrinthe_t labyrinthe = init_labyrinthe(100, 150);
-
-		/*for(int i = 0; i<labyrinthe.hauteur*labyrinthe.largeur; i++){
-			printf("%d ", labyrinthe.matrice_voisins[i]);
-		}*/
-
+		//Boucle d'evenements
 		while (!quit){
-			SDL_PollEvent(&event);
+			while(!quit && SDL_PollEvent(&event)){
+				if (event.type == SDL_QUIT)
+					quit = 1;
+			}
 
-			if (event.type == SDL_QUIT)
-				quit = 1;
-
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			SDL_RenderFillRect(renderer, &rect);
-
-			//afficher_labyrinthe_NB(window, renderer, labyrinthe);
+			//Affichage du labyrinthe
 			afficher_texture_labyrinthe(window, bg_texture ,renderer, labyrinthe);
 
 			SDL_RenderPresent(renderer);
     	}
 	}
 
+	liberer_labyrinthe(&labyrinthe);
 
+	SDL_DestroyTexture(bg_texture);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	IMG_Quit();
+	SDL_Quit();
 
 	return 0;
 }
-
-/*data_t tab[] = {14, 4, 5, 10, 11, 23, 6, 12, 20};
-
-	tri_tas(&tab, 9);
-	for(int i=0; i<9; i++){
-		printf("%d\n", tab[i]);
-	}
-	
-	liste_t ** liste = NULL;
-	partition_t partition;
-	partition = init_partition(11);
-
-	fusion_partition(0, 1, &partition);
-	fusion_partition(2, 3, &partition);
-	fusion_partition(10, 3, &partition);
-	fusion_partition(5, 9, &partition);
-	fusion_partition(4, 6, &partition);
-	fusion_partition(8, 7, &partition);
-	fusion_partition(9, 7, &partition);
-	fusion_partition(6, 8, &partition);
-
-	liste = liste_classes_partition(partition);
-	afficher_table_partition(liste, partition.taille);
-
-	liberer_table_partition(&liste, partition.taille);
-	liberer_partition(&partition);
-
-	//creer_affichage_partition(partition);
-
-	graphe_t graphe = graphe_aleatoire(20, 30);
-	graphe_t arbre_couv = kruskal(graphe);
-
-	affichage_graphe(graphe, "./files/graphe.dot");
-	affichage_graphe(arbre_couv, "./files/arbre_cou.dot");*/
