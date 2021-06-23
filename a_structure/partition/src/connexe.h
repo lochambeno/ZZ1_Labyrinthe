@@ -20,7 +20,8 @@ void afficher_mat(int**, int);
 void liberer_mat(int**, int);
 
 graphe_t init_graphe(int);
-void afficher_graphe(graphe_t graphe);
+void ajouter_arrete(graphe_t*, int, int);
+void afficher_graphe(graphe_t);
 part_t graphe_comp_connexe(graphe_t);
 void afficher_graphe_comp_connexe(graphe_t, int);
 void liberer_graphe(graphe_t*);

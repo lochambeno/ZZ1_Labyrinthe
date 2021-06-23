@@ -86,7 +86,7 @@ graphe_t init_graphe(int taille) {
         int i, j, nbr_arretes=0;
         int arrete_par_noeuds[taille];
         for (i=0;i<taille;++i) arrete_par_noeuds[i]=0;
-        srand(time(NULL));
+        srand(0);
         for (i=0;i<taille;++i) {
             for (j=i+1;j<taille;++j) {
                 if (arrete_par_noeuds[i]<4 && arrete_par_noeuds[j]<4 && rand()%2) {
@@ -101,6 +101,12 @@ graphe_t init_graphe(int taille) {
         graphe.nbr_arretes=nbr_arretes;
     }
     return graphe;
+}
+
+void ajouter_arrete(graphe_t* graphe, int i, int j) {
+    graphe->arrete[graphe->nbr_arretes].A=i;
+    graphe->arrete[graphe->nbr_arretes].B=j;
+    ++(graphe->nbr_arretes);
 }
 
 void afficher_graphe(graphe_t graphe) {
@@ -152,6 +158,7 @@ void afficher_graphe_comp_connexe (graphe_t graphe, int m) {
         }
         liberer_classe(classe);
     }
+    liberer_part(part);
     fclose(fichier);
 }
 

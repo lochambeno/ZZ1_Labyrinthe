@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "partition.h"
 #include "connexe.h"
+#include "kruskal.h"
 
 int main() {
     /*
@@ -50,10 +51,14 @@ int main() {
     
 
     afficher_graphe_comp_connexe(graphe, 0);
-    
+
+    graphe_t arbre_couvrant = kruskal(graphe);
+    afficher_arbre_couvrant(arbre_couvrant);
+
 
     liberer_tableau_classe(classes,taille);
     liberer_part(comp_connexe);
+    liberer_graphe(&arbre_couvrant);
     liberer_graphe(&graphe);
     return 0;
 }
