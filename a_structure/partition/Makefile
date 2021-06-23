@@ -2,12 +2,13 @@ CC = gcc
 DOT = dot
 
 CFLAGS = -g -Wall -Wextra
+SDLC = -lSDL2 -lSDL2_image
 DFLAGS = -Tpng
 
-OBJ = build/main.o build/partition.o build/connexe.o build/kruskal.o build/labyrinthe.o
+OBJ = build/main.o build/partition.o build/connexe.o build/kruskal.o build/labyrinthe.o build/representation.o
 
 prog : $(OBJ)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ $(SDLC)
 
 img/partition.png : file/partition.dot
 	$(DOT) $(DFLAGS) $< -o $@	
@@ -33,7 +34,10 @@ build/kruskal.o : src/kruskal.c src/kruskal.h src/connexe.h src/partition.h
 build/labyrinthe.o : src/labyrinthe.c src/labyrinthe.h src/kruskal.h src/connexe.h src/partition.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-build/main.o : src/main.c src/partition.h src/connexe.h src/kruskal.h src/labyrinthe.h
+build/representation.o : src/representation.c src/representation.h src/labyrinthe.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+build/main.o : src/main.c src/partition.h src/connexe.h src/kruskal.h src/labyrinthe.h src/representation.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 clean :

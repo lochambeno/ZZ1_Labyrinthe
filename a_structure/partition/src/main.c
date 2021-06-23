@@ -1,73 +1,68 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+
 #include "partition.h"
 #include "connexe.h"
 #include "kruskal.h"
 #include "labyrinthe.h"
+#include "representation.h"
 
 int main() {
-    /*
-    part_t part = creer_part(11);
-    fusion_classe(part, 0, 1);
-    fusion_classe(part, 2, 3);
-    fusion_classe(part, 10, 3);
-    fusion_classe(part, 5, 9);
-    fusion_classe(part, 4, 6);
-    fusion_classe(part, 8, 7);
-    fusion_classe(part, 9, 7);
-    fusion_classe(part, 6, 8);
-    int* liste=NULL, taille;
-    lister_classe(part, 7, &liste, &taille);
-    afficher_classe(liste, taille);
-    afficher_part(part);
-    //liste_t**tab=creer_tab(part);
-    //afficher_tableau(tab);
-    //lister_partition(part);
-    //int** mat = mat_adj(10);
-    //afficher_mat(mat, 10);
-    //liberer_mat(mat, 10);
-    */
-    //int taille=5;
-    /*int** mat=mat_adj(taille);
-    afficher_graphe_mat(mat, taille);
-    part_t comp_connexe=mat_comp_connexe(mat, 11);
-    afficher_part(comp_connexe);
-    lister_partition(comp_connexe);
-    liberer_mat(mat, taille);
-    liberer_part(comp_connexe);
-    */
-    /*
-    graphe_t graphe=init_graphe(taille);
-    afficher_graphe(graphe);
-    
-    part_t comp_connexe=graphe_comp_connexe(graphe);
-    afficher_part(comp_connexe);
-    
-    classe_t classe = lister_classe(comp_connexe,0);
-    afficher_classe(classe);
-    liberer_classe(classe);
-    
-    
-    classe_t* classes = lister_partition(comp_connexe);
-    afficher_tableau_classe(classes,taille);
-    
+    SDL_Window * window = NULL;
+	SDL_Renderer * renderer = NULL;
+    SDL_Texture * texture = NULL;
 
-    afficher_graphe_comp_connexe(graphe, 0);
+    create_sdl(&window, &renderer, "Labyrinthe");
+    int fin_programme = 0,
+		pause = 0,
+        window_h,
+        window_w;
 
-    graphe_t arbre_couvrant = kruskal(graphe);
-    afficher_arbre_couvrant(arbre_couvrant);
-    */
-    laby_t grille = init_laby(3, 3), labyrinthe;
-    afficher_graphe(grille.graphe);
-    labyrinthe.graphe = kruskal(grille.graphe);
-    afficher_arbre_couvrant(labyrinthe.graphe);
-    init_carac_laby(&labyrinthe);
-    afficher_carac(labyrinthe);
+    laby_t laby = creer_laby(10,10);
 
-    //liberer_tableau_classe(classes,taille);
-    //liberer_part(comp_connexe);
-    liberer_graphe(&grille.graphe);
-    //liberer_graphe(&labyrinthe.graphe);
-    liberer_labyrinthe(&labyrinthe);
-    return 0;
+    texture = IMG_LoadTexture(renderer, "./img/tileset.png");
+    if (texture == NULL) {
+        end_sdl(0, "Error : can't load texture", window, renderer);
+    }
+
+    SDL_GetWindowSize(window, &window_w, &window_h);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    while (!fin_programme){
+        SDL_Event event;
+            while(!fin_programme && SDL_PollEvent(&event)){
+                switch(event.type){
+                case SDL_QUIT:
+                    fin_programme = 1;
+                    break;
+
+                case SDL_KEYDOWN:
+                    switch(event.key.keysym.sym){
+					case SDLK_p:
+						pause=0;
+						break;
+					case SDLK_ESCAPE:
+						fin_programme = 1;
+						break;
+                    default:
+                        break;
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+
+		draw_laby(renderer, window_h, window_w, texture, laby);
+		SDL_RenderPresent(renderer);
+
+		SDL_Delay(10);
+    }
+
+    //afficher_arbre_couvrant(labyrinthe.graphe);
+    liberer_labyrinthe(&laby);
+    end_sdl(1, "Normal ending", window, renderer);
+    return EXIT_SUCCESS;
 }
