@@ -3,16 +3,21 @@
 #include "partition.h"
 #define TAILLE 10
 
+/* penser à vérifier (part.parent != NULL && part.hauteur != NULL)*/
 part_t creer_part(int n) {
     part_t part;
     int i;
     part.taille = n;
     part.parent = (int*)malloc(n*sizeof(int));
-    part.hauteur = (int*)malloc(n*sizeof(int));
-    if (part.parent!=NULL &&& part.hauteur!=NULL) {
-        for (i=0;i<n;++i) {
-            part.parent[i]=i;
-            part.hauteur[i]=1;
+    if (part.parent != NULL) {
+        part.hauteur = (int*)malloc(n*sizeof(int));
+        if (part.hauteur != NULL) {
+            if (part.parent!=NULL &&& part.hauteur!=NULL) {
+                for (i=0;i<n;++i) {
+                    part.parent[i]=i;
+                    part.hauteur[i]=1;
+                }
+            }
         }
     }
     return part;
@@ -40,6 +45,7 @@ void liberer_part(part_t part) {
     free(part.hauteur);
 }
 
+/* penser à vérifier error*/
 int inserer_liste(liste_t **p_l, int valeur) {
     liste_t *cellule = (liste_t*)malloc(sizeof(liste_t));
     int error=0;
@@ -52,25 +58,33 @@ int inserer_liste(liste_t **p_l, int valeur) {
     return error;
 }
 
+/* penser à vérifier tab != NULL*/
 liste_t** creer_tab(part_t part) {
     liste_t** tab = (liste_t**)malloc(part.taille*sizeof(liste_t*));
-    int i;
-    for (i=0;i<part.taille;++i) {
-        tab[i]=NULL;
-    }
-    for (i=0;i<part.taille;++i) {
-        inserer_liste(&(tab[part.parent[i]]),i);
+    if (tab!=NULL) {
+        int i, error=0;
+        for (i=0;i<part.taille;++i) {
+            tab[i]=NULL;
+        }
+        for (i=0;i<part.taille;++i) {
+            error=inserer_liste(&(tab[part.parent[i]]),i);
+        }
+        if (error) tab = NULL;
     }
     return tab;
 }
 
+/* penser à vérifier classe.liste != NULL*/
 classe_t lister_classe(part_t part, int i) {
-    liste_t** tab=creer_tab(part);
+    liste_t** tab=creer_tab(part); 
     classe_t classe;
     classe.liste=(int*)malloc(part.taille*sizeof(int));
-    classe.taille=0;
-    parcours_rec(tab, recuperer_classe(part, i), &classe);
-    liberer_tableau(tab, part.taille);
+    if (tab == NULL) classe.liste = NULL;
+    if (classe.liste != NULL) {
+        classe.taille=0;
+        parcours_rec(tab, recuperer_classe(part, i), &classe);
+        liberer_tableau(tab, part.taille);
+    }
     return classe;
 }
 
@@ -84,18 +98,26 @@ void parcours_rec(liste_t** tab, int i, classe_t* classe) {
     }
 }
 
+/* penser à vérifier tableau_classe != NULL*/
 classe_t* lister_partition(part_t part) {
+    int i, error = 0;
     liste_t** tab=creer_tab(part);
-    int i;
+    if (tab == NULL) error=1;
     classe_t* tableau_classe=(classe_t*)malloc(part.taille*sizeof(classe_t));
-    for (i=0;i<part.taille;++i) {
-        tableau_classe[i].liste=NULL;
-        if (i==part.parent[i]) {
-            tableau_classe[i].liste=(int*)malloc(part.taille*sizeof(int));
-            tableau_classe[i].taille=0;
-            parcours_rec(tab, i, &tableau_classe[i]);
+    if (!error && tableau_classe != NULL) {
+        for (i=0;i<part.taille;++i) {
+            tableau_classe[i].liste=NULL;
+            if (i==part.parent[i]) {
+                tableau_classe[i].liste=(int*)malloc(part.taille*sizeof(int));
+                if (tableau_classe[i].liste == NULL) error=1;
+                else {
+                    tableau_classe[i].taille=0;
+                    parcours_rec(tab, i, &tableau_classe[i]);
+                }
+            }
         }
     }
+    if (error) tableau_classe = NULL;
     liberer_tableau(tab, part.taille);
     return tableau_classe;
 }
@@ -136,10 +158,12 @@ void afficher_part(part_t part) {
     int i;
     if (fichier != NULL) {
         fprintf(fichier, "digraph Partition {\n");
-        for (i=0;i<part.taille;++i) {
-            fprintf(fichier, "\t%d -> %d;\n", i, part.parent[i]);
+        if (part.parent != NULL) {
+            for (i=0;i<part.taille;++i) {
+                fprintf(fichier, "\t%d -> %d;\n", i, part.parent[i]);
+            }
+            fprintf(fichier, "}\n");
         }
-        fprintf(fichier, "}\n");
     }
     fclose(fichier);
 }

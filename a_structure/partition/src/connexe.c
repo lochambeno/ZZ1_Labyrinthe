@@ -28,10 +28,12 @@ int** mat_adj(int taille) {
 part_t mat_comp_connexe(int** mat, int taille) {
     int i,j;
     part_t comp_connexe = creer_part(taille);
-    for (i=0;i<taille;++i) {
-        for (j=0;j<i;++j) {
-            if (mat[i][j]) {
-                fusion_classe(comp_connexe, i, j);
+    if (comp_connexe.parent != NULL && comp_connexe.hauteur != NULL) {
+        for (i=0;i<taille;++i) {
+            for (j=0;j<i;++j) {
+                if (mat[i][j]) {
+                    fusion_classe(comp_connexe, i, j);
+                }
             }
         }
     }
@@ -75,27 +77,29 @@ void afficher_graphe_mat(int** mat, int taille) {
 
 
 
-
+/* penser à vérifier graphe.arrete != NULL*/
 graphe_t init_graphe(int taille) {
     graphe_t graphe;
     graphe.nbr_noeuds=taille;
     graphe.arrete=(arrete_t*)malloc(taille*4*sizeof(arrete_t));
-    int i, j, nbr_arretes=0;
-    int arrete_par_noeuds[taille];
-    for (i=0;i<taille;++i) arrete_par_noeuds[i]=0;
-    srand(0);
-    for (i=0;i<taille;++i) {
-        for (j=i+1;j<taille;++j) {
-            if (arrete_par_noeuds[i]<4 && arrete_par_noeuds[j]<4 && rand()%2) {
-                graphe.arrete[nbr_arretes].A=i;
-                graphe.arrete[nbr_arretes].B=j;
-                ++nbr_arretes;
-                ++arrete_par_noeuds[i];
-                ++arrete_par_noeuds[j];
+    if (graphe.arrete != NULL) {
+        int i, j, nbr_arretes=0;
+        int arrete_par_noeuds[taille];
+        for (i=0;i<taille;++i) arrete_par_noeuds[i]=0;
+        srand(time(NULL));
+        for (i=0;i<taille;++i) {
+            for (j=i+1;j<taille;++j) {
+                if (arrete_par_noeuds[i]<4 && arrete_par_noeuds[j]<4 && rand()%2) {
+                    graphe.arrete[nbr_arretes].A=i;
+                    graphe.arrete[nbr_arretes].B=j;
+                    ++nbr_arretes;
+                    ++arrete_par_noeuds[i];
+                    ++arrete_par_noeuds[j];
+                }
             }
         }
+        graphe.nbr_arretes=nbr_arretes;
     }
-    graphe.nbr_arretes=nbr_arretes;
     return graphe;
 }
 
@@ -118,8 +122,10 @@ void afficher_graphe(graphe_t graphe) {
 part_t graphe_comp_connexe(graphe_t graphe) {
     int i;
     part_t comp_connexe = creer_part(graphe.nbr_noeuds);
-    for (i=0;i<graphe.nbr_arretes;++i) {
-        fusion_classe(comp_connexe, graphe.arrete[i].A, graphe.arrete[i].B);
+    if (comp_connexe.parent != NULL && comp_connexe.hauteur != NULL) {
+        for (i=0;i<graphe.nbr_arretes;++i) {
+            fusion_classe(comp_connexe, graphe.arrete[i].A, graphe.arrete[i].B);
+        }
     }
     return comp_connexe;
 }
@@ -128,22 +134,24 @@ void afficher_graphe_comp_connexe (graphe_t graphe, int m) {
     FILE* fichier = fopen("file/comp_connexe.dot","w+");
     part_t part= graphe_comp_connexe (graphe);
     int i, j;
-    classe_t classe = lister_classe(part, m);
-    if (fichier != NULL) {
-        fprintf(fichier, "graph Composante_connexe {\n");
-        for (i=0;i<graphe.nbr_arretes;++i) {
-            for (j=0;j<classe.taille;++j) {
-                if (classe.liste[j]==graphe.arrete[i].A) {
-                    fprintf(fichier, "\t%d -- %d;\n", graphe.arrete[i].A, graphe.arrete[i].B);
+    if (part.parent != NULL && part.hauteur != NULL) {
+        classe_t classe = lister_classe(part, m);
+        if (fichier != NULL && classe.liste != NULL) {
+            fprintf(fichier, "graph Composante_connexe {\n");
+            for (i=0;i<graphe.nbr_arretes;++i) {
+                for (j=0;j<classe.taille;++j) {
+                    if (classe.liste[j]==graphe.arrete[i].A) {
+                        fprintf(fichier, "\t%d -- %d;\n", graphe.arrete[i].A, graphe.arrete[i].B);
+                    }
                 }
             }
+            for (j=0;j<classe.taille;++j) {
+                fprintf(fichier, "\t%d;\n", classe.liste[j]);
+            }
+            fprintf(fichier, "}\n");
         }
-        for (j=0;j<classe.taille;++j) {
-            fprintf(fichier, "\t%d;\n", classe.liste[j]);
-        }
-        fprintf(fichier, "}\n");
+        liberer_classe(classe);
     }
-    liberer_classe(classe);
     fclose(fichier);
 }
 

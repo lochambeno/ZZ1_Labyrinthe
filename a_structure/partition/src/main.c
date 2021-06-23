@@ -49,7 +49,7 @@ int main() {
     afficher_tableau_classe(classes,taille);
     
 
-    //afficher_graphe_comp_connexe(graphe, 0);
+    afficher_graphe_comp_connexe(graphe, 0);
     
 
     liberer_tableau_classe(classes,taille);
