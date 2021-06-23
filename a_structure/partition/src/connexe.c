@@ -86,7 +86,7 @@ graphe_t init_graphe(int taille) {
         int i, j, nbr_arretes=0;
         int arrete_par_noeuds[taille];
         for (i=0;i<taille;++i) arrete_par_noeuds[i]=0;
-        srand(0);
+        srand(time(NULL));
         for (i=0;i<taille;++i) {
             for (j=i+1;j<taille;++j) {
                 if (arrete_par_noeuds[i]<4 && arrete_par_noeuds[j]<4 && rand()%2) {

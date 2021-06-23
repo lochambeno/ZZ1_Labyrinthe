@@ -30,7 +30,7 @@ build/connexe.o : src/connexe.c src/connexe.h src/partition.h
 build/kruskal.o : src/kruskal.c src/kruskal.h src/connexe.h src/partition.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-build/labyrinthe.o : src/labyrinthe.c
+build/labyrinthe.o : src/labyrinthe.c src/labyrinthe.h src/kruskal.h src/connexe.h src/partition.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 build/main.o : src/main.c src/partition.h src/connexe.h src/kruskal.h src/labyrinthe.h

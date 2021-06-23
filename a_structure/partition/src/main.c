@@ -3,6 +3,7 @@
 #include "partition.h"
 #include "connexe.h"
 #include "kruskal.h"
+#include "labyrinthe.h"
 
 int main() {
     /*
@@ -26,7 +27,7 @@ int main() {
     //afficher_mat(mat, 10);
     //liberer_mat(mat, 10);
     */
-    int taille=5;
+    //int taille=5;
     /*int** mat=mat_adj(taille);
     afficher_graphe_mat(mat, taille);
     part_t comp_connexe=mat_comp_connexe(mat, 11);
@@ -35,6 +36,7 @@ int main() {
     liberer_mat(mat, taille);
     liberer_part(comp_connexe);
     */
+    /*
     graphe_t graphe=init_graphe(taille);
     afficher_graphe(graphe);
     
@@ -54,11 +56,14 @@ int main() {
 
     graphe_t arbre_couvrant = kruskal(graphe);
     afficher_arbre_couvrant(arbre_couvrant);
-
-
-    liberer_tableau_classe(classes,taille);
-    liberer_part(comp_connexe);
-    liberer_graphe(&arbre_couvrant);
-    liberer_graphe(&graphe);
+    */
+    laby_t labyrinthe = init_laby(10, 10);
+    afficher_graphe(labyrinthe.graphe);
+    labyrinthe.graphe = kruskal(labyrinthe.graphe);
+    afficher_arbre_couvrant(labyrinthe.graphe);
+    //liberer_tableau_classe(classes,taille);
+    //liberer_part(comp_connexe);
+    //liberer_graphe(&arbre_couvrant);
+    liberer_graphe(&labyrinthe.graphe);
     return 0;
 }
