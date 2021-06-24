@@ -1,6 +1,6 @@
 CC= gcc
 CFLAGS= -g -Wall -Wextra
-LDFLAGS= -lSDL2 -lSDL2_image
+LDFLAGS= -lSDL2 -lSDL2_image -lm
 OBJ= build/tas_noeuds.o build/main.o build/partition.o build/liste.o build/graphe.o build/labyrinthe.o build/voiture.o
 
 prog:$(OBJ)

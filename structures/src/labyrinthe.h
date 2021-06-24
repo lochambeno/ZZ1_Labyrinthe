@@ -25,5 +25,6 @@ int direction_labyrinthe(int i, int j, int largeur);
 noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart);
 void ecrire_chemin_court(noeud_t * table_noeud, int depart, int destination);
 liste_t * liste_chemin_court(noeud_t * table_noeud, int depart, int destination);
+noeud_t * a_star(labyrinthe_t labyrinthe, int depart, int arrive, int type);
 
 #endif

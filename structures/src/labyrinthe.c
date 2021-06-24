@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 #include "labyrinthe.h"
 #include "tas_noeuds.h"
 #include "liste.h"
@@ -115,6 +116,8 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 
 	return labyrinthe;
 }
+
+
 
 void afficher_labyrinthe_NB(SDL_Window * window, SDL_Renderer * renderer, labyrinthe_t labyrinthe){
 	int i, noeud1, noeud2;
@@ -303,8 +306,8 @@ void modifier_tas_lab(noeud_t nouveau_noeud, tas_t * tas, int ** noeuds_tas){
 }
 
 //recupere le noeud au dessus du tas et ajoute les noeuds qui lui sont
-//adjacent
-void ajout_noeuds_tas(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas){
+//adjacent //int poids
+void ajout_noeuds_tas_dijkstra(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas){
 	noeud_t a_traite = *sommet_tas(tas);
 	noeud_t a_inserer;
 	int direction = labyrinthe.matrice_voisins[a_traite.id_noeud].direction;
@@ -398,7 +401,7 @@ noeud_t * dijkstra(labyrinthe_t labyrinthe, int depart){
 			en_traitement = *sommet_tas(&tas);
 			table_noeuds[en_traitement.id_noeud] = en_traitement;
 			//ajoute les noeuds dans le tas 
-			ajout_noeuds_tas(labyrinthe, &tas, &noeuds_tas);
+			ajout_noeuds_tas_dijkstra(labyrinthe, &tas, &noeuds_tas);
 	
 			//on a traite un noeud en plus
 			nbr_traites++;
@@ -430,4 +433,261 @@ void ecrire_chemin_court(noeud_t * table_noeud, int depart, int destination){
 	}
 
 	printf("\n");
+}
+
+void ajout_noeuds_tas_a_star_manhattan(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas, int destination){
+	noeud_t a_traite = *sommet_tas(tas);
+	noeud_t a_inserer;
+	int direction = labyrinthe.matrice_voisins[a_traite.id_noeud].direction;
+
+	supprimer_tas(tas, noeuds_tas);
+
+	//1:N ; 2:S ; 4:E ; 8:O
+	if(direction & 1){
+		a_inserer.id_noeud = a_traite.id_noeud - labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur)
+							+  abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 2){
+		a_inserer.id_noeud = a_traite.id_noeud + labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids =abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur)
+							+  abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 4){
+		a_inserer.id_noeud = a_traite.id_noeud + 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur)
+							+  abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 8){
+		a_inserer.id_noeud = a_traite.id_noeud - 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur)
+							+  abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur);
+		
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+}
+
+int max(int i, int j){
+	int retour = i;
+
+	if(i < j){
+		retour = j;
+	}
+
+	return retour;
+}
+
+void ajout_noeuds_tas_a_star_tchebichev(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas, int destination){
+	noeud_t a_traite = *sommet_tas(tas);
+	noeud_t a_inserer;
+	int direction = labyrinthe.matrice_voisins[a_traite.id_noeud].direction;
+
+	supprimer_tas(tas, noeuds_tas);
+
+	//1:N ; 2:S ; 4:E ; 8:O
+	if(direction & 1){
+		a_inserer.id_noeud = a_traite.id_noeud - labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = max(abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur),
+							abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur));
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 2){
+		a_inserer.id_noeud = a_traite.id_noeud + labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = max(abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur),
+							abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur));
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 4){
+		a_inserer.id_noeud = a_traite.id_noeud + 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = max(abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur),
+							abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur));
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 8){
+		a_inserer.id_noeud = a_traite.id_noeud - 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = max(abs((a_inserer.id_noeud/labyrinthe.largeur) - destination/labyrinthe.largeur),
+							abs((a_inserer.id_noeud%labyrinthe.largeur) - destination%labyrinthe.largeur));
+		
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+}
+
+int dist_euc(int x1, int x2, int y1, int y2){
+	return sqrt(((x1-y1) * (x1-y1) + (x2-y2) * (x2-y2))) ;
+}
+
+void ajout_noeuds_tas_a_star_euclide(labyrinthe_t labyrinthe, tas_t * tas, int ** noeuds_tas, int destination){
+	noeud_t a_traite = *sommet_tas(tas);
+	noeud_t a_inserer;
+	int direction = labyrinthe.matrice_voisins[a_traite.id_noeud].direction;
+
+	supprimer_tas(tas, noeuds_tas);
+
+	//1:N ; 2:S ; 4:E ; 8:O
+	if(direction & 1){
+		a_inserer.id_noeud = a_traite.id_noeud - labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = dist_euc(a_inserer.id_noeud/labyrinthe.largeur, a_inserer.id_noeud%labyrinthe.largeur,
+							destination/labyrinthe.largeur, destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 2){
+		a_inserer.id_noeud = a_traite.id_noeud + labyrinthe.largeur;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = dist_euc(a_inserer.id_noeud/labyrinthe.largeur, a_inserer.id_noeud%labyrinthe.largeur,
+							destination/labyrinthe.largeur, destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 4){
+		a_inserer.id_noeud = a_traite.id_noeud + 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = dist_euc(a_inserer.id_noeud/labyrinthe.largeur, a_inserer.id_noeud%labyrinthe.largeur,
+							destination/labyrinthe.largeur, destination%labyrinthe.largeur);
+
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+
+	if(direction & 8){
+		a_inserer.id_noeud = a_traite.id_noeud - 1;
+		a_inserer.parent = a_traite.id_noeud;
+		a_inserer.poids = dist_euc(a_inserer.id_noeud/labyrinthe.largeur, a_inserer.id_noeud%labyrinthe.largeur,
+							destination/labyrinthe.largeur, destination%labyrinthe.largeur);
+		
+		if((*noeuds_tas)[a_inserer.id_noeud] == -1)
+				inserer_tas(tas, a_inserer, noeuds_tas);
+		else{
+			if((*noeuds_tas)[a_inserer.id_noeud] != -2 && a_inserer.poids < tas->tas[(*noeuds_tas)[a_inserer.id_noeud]].poids)
+				modifier_tas_lab(a_inserer, tas, noeuds_tas);
+		}
+	}
+}
+
+noeud_t * a_star(labyrinthe_t labyrinthe, int depart, int arrive, int type){
+	tas_t tas = init_tas(10);
+	int * noeuds_tas = NULL;
+
+	noeud_t a_traite;
+	noeud_t en_traitement;
+	noeud_t * table_noeuds = NULL;
+
+	int nbr_traites = 0, 
+		i,
+		taille = labyrinthe.hauteur * labyrinthe.largeur;
+
+	noeuds_tas = (int*) malloc(sizeof(int) * taille);
+	table_noeuds = (noeud_t*) malloc(sizeof(noeud_t) * taille);
+
+	if(noeuds_tas != NULL && table_noeuds != NULL){
+		//initialisation de la matrice et du tas
+		for(i=0; i<taille; i++){
+			noeuds_tas[i] = -1;
+		}
+		
+		a_traite.id_noeud = depart;
+		a_traite.parent = depart;
+		a_traite.poids = 0;
+
+		inserer_tas(&tas, a_traite, &noeuds_tas);
+
+		while(nbr_traites < taille && noeuds_tas[arrive] != -2){
+			en_traitement = *sommet_tas(&tas);
+			table_noeuds[en_traitement.id_noeud] = en_traitement;
+			
+			//ajoute les noeuds dans le tas 
+			if(type == 1)
+				ajout_noeuds_tas_a_star_manhattan(labyrinthe, &tas, &noeuds_tas, arrive);
+			else if(type == 2)
+				ajout_noeuds_tas_a_star_tchebichev(labyrinthe, &tas, &noeuds_tas, arrive);
+			else if(type == 3)
+				ajout_noeuds_tas_a_star_euclide(labyrinthe, &tas, &noeuds_tas, arrive);
+
+			//on a traite un noeud en plus
+			nbr_traites++;
+		}
+	}
+	liberer_tas(&tas);
+	free(noeuds_tas);
+	return table_noeuds;
 }
