@@ -10,7 +10,7 @@ void liberer_liste(liste_t ** liste){
     liste_t * prec = *liste;
     liste_t * temp = NULL;
 
-    while(prec->suiv != NULL){
+    while(prec!=NULL && prec->suiv != NULL ){
         temp = prec;
         prec = prec->suiv;
         free(temp);

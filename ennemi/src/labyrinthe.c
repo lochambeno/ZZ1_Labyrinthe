@@ -101,7 +101,7 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 		}
 
 		fisher_yate(&labyrinthe);
-		retour = kruskal(labyrinthe.graph_lab, 5);
+		retour = kruskal(labyrinthe.graph_lab, 20);
 		
 		liberer_graphe(&(labyrinthe.graph_lab));
 		labyrinthe.graph_lab = retour;
