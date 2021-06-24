@@ -27,12 +27,17 @@ int main(){
                 ** joueur_D = NULL,
 				** joueur_G = NULL,
 				** texture_joueur = NULL,
-				** piece = NULL;
+				** piece = NULL,
+				** mur = NULL;
 
 
 
 	SDL_Color color_text = {255, 255, 255, 255};
     SDL_Rect pos_text = {20, 20, 0, 0}, pos_score = {20, 20, 0, 0};
+
+
+
+
 
 
    TTF_Font* font = NULL;
@@ -119,6 +124,24 @@ int main(){
 			table_ennemi_D[3] = IMG_LoadTexture(renderer, "./images/SkeletonD_4.png");
 
 
+			mur = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 15);
+			mur[0] = IMG_LoadTexture(renderer, "./images/Murs_laby/N.png");
+			mur[1] = IMG_LoadTexture(renderer, "./images/Murs_laby/S.png");
+			mur[2] = IMG_LoadTexture(renderer, "./images/Murs_laby/NS.png");
+			mur[3] = IMG_LoadTexture(renderer, "./images/Murs_laby/E.png");
+			mur[4] = IMG_LoadTexture(renderer, "./images/Murs_laby/NE.png");
+			mur[5] = IMG_LoadTexture(renderer, "./images/Murs_laby/SE.png");
+			mur[6] = IMG_LoadTexture(renderer, "./images/Murs_laby/NSE.png");
+			mur[7] = IMG_LoadTexture(renderer, "./images/Murs_laby/O.png");
+			mur[8] = IMG_LoadTexture(renderer, "./images/Murs_laby/NO.png");
+			mur[9] = IMG_LoadTexture(renderer, "./images/Murs_laby/SO.png");
+			mur[10] = IMG_LoadTexture(renderer, "./images/Murs_laby/NSO.png");
+			mur[11] = IMG_LoadTexture(renderer, "./images/Murs_laby/E0.png");
+			mur[12] = IMG_LoadTexture(renderer, "./images/Murs_laby/NEO.png");
+			mur[13] = IMG_LoadTexture(renderer, "./images/Murs_laby/SEO.png");
+			mur[14] = IMG_LoadTexture(renderer, "./images/Murs_laby/NSEO.png");
+
+
 			cour = cour_chemin;
 
 
@@ -152,7 +175,7 @@ int main(){
 				}
 
 				//Affichage du labyrinthe
-				afficher_texture_labyrinthe(window, bg_texture ,renderer, labyrinthe);
+				afficher_texture_labyrinthe(window, mur ,renderer, labyrinthe);
 
 				afficher_joueur(position_joueur, N, M, texture_joueur[state], renderer, window);
 
