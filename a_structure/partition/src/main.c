@@ -22,8 +22,8 @@ int main() {
         window_w,
         state=0;
 
-    laby_t laby = creer_laby(100,100,10);
-    int* exploration = parcours_prof(laby);
+    laby_t laby = creer_laby(50,75,10);
+    exploration_t exploration = parcours_prof(laby);
 
     texture = IMG_LoadTexture(renderer, "./img/tileset.png");
     if (texture == NULL) {
@@ -57,14 +57,16 @@ int main() {
                     break;
                 }
             }
-        if (state<laby.graphe.nbr_noeuds) ++state;
+        
 		draw_laby_parcours_prof(renderer, window_h, window_w, texture, laby, exploration, state);
+        if (state<exploration.taille-1) ++state;
 		SDL_RenderPresent(renderer);
 
 		SDL_Delay(10);
     }
 
     //afficher_arbre_couvrant(labyrinthe.graphe);
+    free(exploration.liste);
     liberer_labyrinthe(&laby);
     end_sdl(1, "Normal ending", window, renderer);
     return EXIT_SUCCESS;

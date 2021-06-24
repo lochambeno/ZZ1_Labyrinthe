@@ -148,10 +148,10 @@ void draw_laby(SDL_Renderer* renderer, int window_h, int window_w, SDL_Texture* 
 }
 
 
-void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w, SDL_Texture* texture, laby_t laby, int* exploration, int state) {
+void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w, SDL_Texture* texture, laby_t laby, exploration_t exploration, int state) {
     int i;
 
-    SDL_Rect source={0}, destination={0};
+    SDL_Rect source={0}, destination={0}, animation={0};
 
     SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
 
@@ -161,11 +161,14 @@ void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w,
     destination.h = window_h/laby.hauteur;
     destination.w = window_w/laby.largeur;
 
-    for (i=0; i<state; ++i) {
-        destination.x = destination.w*(exploration[i]%laby.largeur);
-        destination.y = destination.h*(exploration[i]/laby.largeur);
+    animation.h = destination.h;
+    animation.w = destination.w;
 
-        switch (laby.caracteristique[exploration[i]].NSEO) {
+    for (i=0; i<state; ++i) {
+        destination.x = destination.w*(exploration.liste[i]%laby.largeur);
+        destination.y = destination.h*(exploration.liste[i]/laby.largeur);
+
+        switch (laby.caracteristique[exploration.liste[i]].NSEO) {
             case 15:
                 source.x=9*source.w;
                 source.y=0*source.h;
@@ -233,5 +236,8 @@ void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w,
         }
         SDL_RenderCopy(renderer, texture, &source, &destination);
     }
+    animation.x = animation.w*(exploration.liste[i]%laby.largeur);
+    animation.y = animation.h*(exploration.liste[i]/laby.largeur);
+    SDL_RenderFillRect(renderer, &animation);
 }
  

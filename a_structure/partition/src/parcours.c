@@ -27,36 +27,42 @@ int* liste_voisins(laby_t laby, int noeud, int* taille) {
     return liste;
 }
 
-void explorer(laby_t laby, int** marquage, int noeud, int** exploration, int* sommet) {
+void explorer(laby_t laby, int** marquage, int noeud, exploration_t* exploration) {
     (*marquage)[noeud]=1;
-    (*exploration)[*sommet]=noeud;
-    ++(*sommet);
+    exploration->liste[exploration->taille]=noeud;
+    ++(exploration->taille);
     //deplacer(noeud);
     int taille=0, i;
     int* liste = liste_voisins(laby, noeud, &taille);
     if (liste != NULL) {
         for (i=0; i<taille; ++i) {
             if (!(*marquage)[liste[i]]) {
-                explorer(laby,marquage,liste[i], exploration, sommet);
+                explorer(laby,marquage,liste[i], exploration);
+                exploration->liste[exploration->taille]=noeud;
+                ++(exploration->taille);
             }
         }
         //deplacer(noeud);
         free(liste);
     }
+    //exploration->liste[exploration->taille]=noeud;
+    //++(exploration->taille);
 }
 
-int* parcours_prof(laby_t laby) {
-    int* exploration = (int*)malloc(laby.graphe.nbr_noeuds*sizeof(int));
-    if (exploration != NULL) {
+exploration_t parcours_prof(laby_t laby) {
+    exploration_t exploration;
+    exploration.taille=0;
+    exploration.liste = (int*)malloc(4*laby.graphe.nbr_noeuds*sizeof(int));
+    if (exploration.liste != NULL) {
         int* marquage = (int*)malloc(laby.graphe.nbr_noeuds*sizeof(int));
         if (marquage != NULL) {
-            int i, sommet=0;
+            int i;
             for (i=0; i<laby.graphe.nbr_noeuds; ++i) {
                 marquage[i]=0;
             }
             for (i=0; i<laby.graphe.nbr_noeuds; ++i) {
                 if (!marquage[i]) {
-                    explorer(laby, &marquage, i, &exploration, &sommet);
+                    explorer(laby, &marquage, i, &exploration);
                 }
             }
             free(marquage);

@@ -34,7 +34,7 @@ build/kruskal.o : src/kruskal.c src/kruskal.h src/connexe.h src/partition.h
 build/labyrinthe.o : src/labyrinthe.c src/labyrinthe.h src/kruskal.h src/connexe.h src/partition.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-build/representation.o : src/representation.c src/representation.h src/labyrinthe.h
+build/representation.o : src/representation.c src/representation.h src/labyrinthe.h src/parcours.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 build/parcours.o : src/parcours.c src/parcours.h src/labyrinthe.h
