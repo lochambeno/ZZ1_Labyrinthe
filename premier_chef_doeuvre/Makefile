@@ -13,13 +13,13 @@ build/score.o : src/score.c src/score.h src/window.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/asteroid.o:src/asteroid.c
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/vaisseau.o:src/vaisseau.c
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/main.o:src/main.c src/vaisseau.h src/asteroid.h src/window.h src/score.h
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean : 
 	rm -f $(OBJ)
