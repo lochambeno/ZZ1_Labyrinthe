@@ -240,4 +240,19 @@ void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w,
     animation.y = animation.h*(exploration.liste[i]/laby.largeur);
     SDL_RenderFillRect(renderer, &animation);
 }
+
+int direction(exploration_t exploration, int i) {
+    int depart=exploration.liste[i];
+    int arrivee=exploration.liste[i+1];
+    int direction = 0;
+    if (depart == arrivee-1) direction = 2;
+    else {
+        if (depart == arrivee+1) direction = 1;
+        else {
+            if (depart<arrivee) direction = 4;
+            else direction = 8;
+        }
+    }
+    return direction;
+}
  
