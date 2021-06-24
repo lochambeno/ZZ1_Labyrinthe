@@ -5,7 +5,7 @@ CFLAGS = -g -Wall -Wextra
 SDLC = -lSDL2 -lSDL2_image
 DFLAGS = -Tpng
 
-OBJ = build/main.o build/partition.o build/connexe.o build/kruskal.o build/labyrinthe.o build/representation.o
+OBJ = build/main.o build/partition.o build/connexe.o build/kruskal.o build/labyrinthe.o build/representation.o build/parcours.o
 
 prog : $(OBJ)
 	$(CC) $^ -o $@ $(SDLC)
@@ -37,7 +37,10 @@ build/labyrinthe.o : src/labyrinthe.c src/labyrinthe.h src/kruskal.h src/connexe
 build/representation.o : src/representation.c src/representation.h src/labyrinthe.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
-build/main.o : src/main.c src/partition.h src/connexe.h src/kruskal.h src/labyrinthe.h src/representation.h
+build/parcours.o : src/parcours.c src/parcours.h src/labyrinthe.h
+	$(CC) $(CFLAGS) $< -c -o $@
+
+build/main.o : src/main.c src/partition.h src/connexe.h src/kruskal.h src/labyrinthe.h src/representation.h src/parcours.h
 	$(CC) $(CFLAGS) $< -c -o $@
 
 clean :

@@ -72,9 +72,9 @@ void liberer_labyrinthe(laby_t* labyrinthe) {
     liberer_graphe(&labyrinthe->graphe);
 }
 
-laby_t creer_laby(int hauteur, int largeur) {
+laby_t creer_laby(int hauteur, int largeur, int proba) {
     laby_t grille = init_laby(hauteur, largeur), laby;
-    laby.graphe = kruskal(grille.graphe);
+    laby.graphe = kruskal(grille.graphe, proba);
     laby.hauteur=hauteur;
     laby.largeur=largeur;
     init_carac_laby(&laby);

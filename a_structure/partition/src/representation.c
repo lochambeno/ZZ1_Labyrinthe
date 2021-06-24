@@ -147,10 +147,91 @@ void draw_laby(SDL_Renderer* renderer, int window_h, int window_w, SDL_Texture* 
     }
 }
 
-/*
-void draw_line(SDL_Renderer renderer, carac_t carac) {
-    if (carac.NSE0 && 8) {
-        SDL_RenderDrawLine
+
+void draw_laby_parcours_prof(SDL_Renderer* renderer, int window_h, int window_w, SDL_Texture* texture, laby_t laby, int* exploration, int state) {
+    int i;
+
+    SDL_Rect source={0}, destination={0};
+
+    SDL_QueryTexture(texture, NULL, NULL, &source.w, &source.h);
+
+    source.h=source.h/8;
+    source.w=source.w/12;
+
+    destination.h = window_h/laby.hauteur;
+    destination.w = window_w/laby.largeur;
+
+    for (i=0; i<state; ++i) {
+        destination.x = destination.w*(exploration[i]%laby.largeur);
+        destination.y = destination.h*(exploration[i]/laby.largeur);
+
+        switch (laby.caracteristique[exploration[i]].NSEO) {
+            case 15:
+                source.x=9*source.w;
+                source.y=0*source.h;
+                break;
+            case 14:
+                source.x=4*source.w;
+                source.y=2*source.h;
+                break;
+            case 13:
+                source.x=5*source.w;
+                source.y=2*source.h;
+                break;
+            case 12:
+                source.x=0;
+                source.y=0;
+                break;
+            case 11:
+                source.x=4*source.w;
+                source.y=3*source.h;
+                break;
+            case 10:
+                source.x=5*source.w;
+                source.y=source.h;
+                break;
+            case 9:
+                source.x=6*source.w;
+                source.y=source.h;
+                break;
+            case 8:
+                source.x=9*source.w;
+                source.y=2*source.h;
+                break;
+            case 7:
+                source.x=5*source.w;
+                source.y=3*source.h;
+                break;
+            case 6:
+                source.x=5*source.w;
+                source.y=0;
+                break;
+            case 5:
+                source.x=6*source.w;
+                source.y=0;
+                break;
+            case 4:
+                source.x=8*source.w;
+                source.y=2*source.h;
+                break;
+            case 3:
+                source.x=0;
+                source.y=source.h;
+                break;
+            case 2:
+                source.x=8*source.w;
+                source.y=3*source.h;
+                break;
+            case 1:
+                source.x=9*source.w;
+                source.y=3*source.h;
+                break;
+            default:
+                source.x=0;
+                source.y=2*source.h;
+                break;
+        }
+        SDL_RenderCopy(renderer, texture, &source, &destination);
     }
-}*/
+}
  

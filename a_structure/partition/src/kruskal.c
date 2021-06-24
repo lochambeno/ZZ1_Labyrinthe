@@ -11,15 +11,15 @@ void echange_arrete(graphe_t* p_graphe, int i, int j) {
 
 void fisher_yate(graphe_t* p_graphe) {
     int i;
-    srand(time(NULL));
     for (i=p_graphe->nbr_arretes-1; i>0; --i) {
         echange_arrete(p_graphe, rand()%i, i);
     }
 }
 
 /* penser à vérifier arbre_couvrant.arrete != NULL */
-graphe_t kruskal(graphe_t graphe) {
+graphe_t kruskal(graphe_t graphe, int proba) {
     int i;
+    srand(time(NULL));
     fisher_yate(&graphe);
     part_t part = creer_part(graphe.nbr_noeuds);
     graphe_t arbre_couvrant;
@@ -32,6 +32,11 @@ graphe_t kruskal(graphe_t graphe) {
                 if (recuperer_classe(part, graphe.arrete[i].A) != recuperer_classe(part, graphe.arrete[i].B)) {
                     fusion_classe(part, graphe.arrete[i].A, graphe.arrete[i].B);
                     ajouter_arrete(&arbre_couvrant, graphe.arrete[i].A, graphe.arrete[i].B);
+                }
+                else {
+                    if (rand()%100<proba) {
+                        ajouter_arrete(&arbre_couvrant, graphe.arrete[i].A, graphe.arrete[i].B);
+                    }
                 }
             }
         }

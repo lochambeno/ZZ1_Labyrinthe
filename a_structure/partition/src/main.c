@@ -8,6 +8,7 @@
 #include "kruskal.h"
 #include "labyrinthe.h"
 #include "representation.h"
+#include "parcours.h"
 
 int main() {
     SDL_Window * window = NULL;
@@ -18,9 +19,11 @@ int main() {
     int fin_programme = 0,
 		pause = 0,
         window_h,
-        window_w;
+        window_w,
+        state=0;
 
-    laby_t laby = creer_laby(10,10);
+    laby_t laby = creer_laby(100,100,10);
+    int* exploration = parcours_prof(laby);
 
     texture = IMG_LoadTexture(renderer, "./img/tileset.png");
     if (texture == NULL) {
@@ -54,8 +57,8 @@ int main() {
                     break;
                 }
             }
-
-		draw_laby(renderer, window_h, window_w, texture, laby);
+        if (state<laby.graphe.nbr_noeuds) ++state;
+		draw_laby_parcours_prof(renderer, window_h, window_w, texture, laby, exploration, state);
 		SDL_RenderPresent(renderer);
 
 		SDL_Delay(10);
