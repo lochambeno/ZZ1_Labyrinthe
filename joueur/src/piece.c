@@ -5,7 +5,7 @@
 
 void afficher_piece(int case_piece, int hauteur, int largeur, SDL_Texture * texture_piece, SDL_Renderer * renderer, SDL_Window * window) {
     int win_w, win_h;
-    float zoom = 0.66;
+    float zoom = 0.6;
 	SDL_Rect piece, source = {0};
 
 	SDL_GetWindowSize(window, &win_w, &win_h);

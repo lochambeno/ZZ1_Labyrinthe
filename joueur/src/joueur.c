@@ -5,7 +5,7 @@
 
 void afficher_joueur(int case_joueur, int hauteur, int largeur, SDL_Texture * texture_joueur, SDL_Renderer * renderer, SDL_Window * window) {
     int win_w, win_h;
-    float zoom = 0.66;
+    float zoom = 0.45;
 	SDL_Rect joueur, source = {0};
 
 	SDL_GetWindowSize(window, &win_w, &win_h);
