@@ -10,11 +10,11 @@
 #include "labyrinthe.h"
 #include "voiture.h"
 
-#define N 2000
-#define M 2000
+#define N 20
+#define M 30
 
 int main(){	
-	srand(10);
+	srand(1);
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL; 
 	SDL_Texture * bg_texture = NULL;
@@ -32,7 +32,7 @@ int main(){
 	SDL_Rect 	destination_rect = {0},
 				origine_rect = {0};
 
-	clock_t debut, fin;
+	//clock_t debut, fin;
 
 	//Initialisation de la SDL2
 	if (SDL_Init(SDL_INIT_VIDEO) == 0){
@@ -88,7 +88,7 @@ int main(){
 				if (event.type == SDL_QUIT)
 					quit = 1;
 			}
-/*
+
 			//Affichage du labyrinthe
 			afficher_texture_labyrinthe(window, bg_texture ,renderer, labyrinthe);
 
@@ -101,7 +101,7 @@ int main(){
 			SDL_RenderFillRect(renderer, &origine_rect);
 			
 			afficher_voiture(position_voiture, direction_voiture, N, M, table_voiture, renderer, window);
-*/
+
 			if(cour != NULL && cour->suiv != NULL && destination != position_voiture){
 				cour = cour->suiv;
 
@@ -118,12 +118,12 @@ int main(){
 				
 				destination = rand()%(N*M);
 
-				debut = clock();
-				table_noeud = a_star(labyrinthe, position_voiture, destination, 3);
+				//debut = clock();
+				table_noeud = a_star(labyrinthe, position_voiture, destination, 1);
 				//table_noeud = dijkstra(labyrinthe, position_voiture);
-				fin = clock();
+				//fin = clock();
 
-				printf("%lu \n", (fin - debut) * 1000 / CLOCKS_PER_SEC);
+				//printf("%lu \n", (fin - debut) * 1000 / CLOCKS_PER_SEC);
 
 				cour_chemin = liste_chemin_court(table_noeud, position_voiture, destination);
 				
