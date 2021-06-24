@@ -147,7 +147,7 @@ void sous_graphe_composante_connexe(graphe_t graphe, int noeud){
 	liberer_partition(&cc);
 }
 
-graphe_t kruskal(graphe_t graphe){
+graphe_t kruskal(graphe_t graphe, int p){
 	graphe_t arbre_cou = init_graphe(graphe.nbr_noeuds);
 	partition_t partition = init_partition(graphe.nbr_noeuds);
 	int i;
@@ -163,6 +163,11 @@ graphe_t kruskal(graphe_t graphe){
 			
 			fusion_partition(noeud1, noeud2, &partition);
 			ajouter_arrete_graphe(noeud1, noeud2, poids, &arbre_cou);
+		}
+		else{
+			if(rand()%100 < p){
+				ajouter_arrete_graphe(noeud1, noeud2, poids, &arbre_cou);
+			}
 		}
 	}
 	return arbre_cou;

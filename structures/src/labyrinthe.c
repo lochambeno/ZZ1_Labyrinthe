@@ -7,8 +7,6 @@
 
 #define MAX_I 2147483647
 
-//melange les arretes d'un labyrinthe
-// A REFAIRE
 void fisher_yate(labyrinthe_t * labyrinthe){
 	arrete_t * permuttation = (arrete_t*) malloc(labyrinthe->graph_lab.nbr_arretes*sizeof(arrete_t));
 	//int nbr_permuttation = labyrinthe->nbr_arretes;
@@ -102,7 +100,7 @@ labyrinthe_t init_labyrinthe(int hauteur, int largeur){
 		}
 
 		fisher_yate(&labyrinthe);
-		retour = kruskal(labyrinthe.graph_lab);
+		retour = kruskal(labyrinthe.graph_lab, 5);
 		
 		liberer_graphe(&(labyrinthe.graph_lab));
 		labyrinthe.graph_lab = retour;

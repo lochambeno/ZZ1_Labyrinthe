@@ -24,7 +24,7 @@ graphe_t graphe_aleatoire(int , int );
 partition_t composantes_connexes(graphe_t);
 
 //algorithmes
-graphe_t kruskal(graphe_t graphe);
+graphe_t kruskal(graphe_t graphe, int);
 
 void sous_graphe_composante_connexe(graphe_t graphe, int noeud);
 void liberer_graphe(graphe_t * graphe);

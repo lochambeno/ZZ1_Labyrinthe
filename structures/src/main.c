@@ -7,19 +7,29 @@
 #include "liste.h"
 #include "graphe.h"
 #include "labyrinthe.h"
+#include "voiture.h"
+
+#define N 20
+#define M 30
 
 int main(){	
-	srand(1);
+	srand(10);
 	SDL_Window * window = NULL;
 	SDL_Renderer * renderer = NULL; 
 	SDL_Texture * bg_texture = NULL;
+	SDL_Texture ** table_voiture = NULL;
 
 	SDL_Event event;
 	//SDL_Rect rect;
 
-	labyrinthe_t labyrinthe = init_labyrinthe(20, 30);
-	int quit = 0;
+	labyrinthe_t labyrinthe = init_labyrinthe(N, M);
+	int quit = 0, position_voiture, direction_voiture = 1, destination = 0, depart;
 	noeud_t * table_noeud = NULL;
+	liste_t * cour_chemin = creer_liste();
+	liste_t * cour = NULL;
+
+	SDL_Rect 	destination_rect = {0},
+				origine_rect = {0};
 
 	//Initialisation de la SDL2
 	if (SDL_Init(SDL_INIT_VIDEO) == 0){
@@ -51,6 +61,24 @@ int main(){
 			exit(EXIT_FAILURE);
 		}
 
+		table_voiture = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 4);
+
+		table_voiture[0] = IMG_LoadTexture(renderer, "./images/rounded_red_right.png");
+		table_voiture[1] = IMG_LoadTexture(renderer, "./images/rounded_red_left.png");
+		table_voiture[2] = IMG_LoadTexture(renderer, "./images/rounded_red_up.png");
+		table_voiture[3] = IMG_LoadTexture(renderer, "./images/rounded_red_down.png");
+
+		position_voiture = 0;
+		depart = position_voiture;
+
+		cour = cour_chemin;
+
+		destination_rect.w = 1080/M;
+		destination_rect.h = 720/N;
+
+		origine_rect.w = 1080/M;
+		origine_rect.h = 720/N;
+
 		//Boucle d'evenements
 		while (!quit){
 			while(!quit && SDL_PollEvent(&event)){
@@ -61,13 +89,48 @@ int main(){
 			//Affichage du labyrinthe
 			afficher_texture_labyrinthe(window, bg_texture ,renderer, labyrinthe);
 
+			//affichage destination
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+			SDL_RenderFillRect(renderer, &destination_rect);
+
+			//affichage origine
+			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+			SDL_RenderFillRect(renderer, &origine_rect);
+			
+			afficher_voiture(position_voiture, direction_voiture, N, M, table_voiture, renderer, window);
+
+			if(cour != NULL && cour->suiv != NULL && destination != position_voiture){
+				cour = cour->suiv;
+
+				direction_voiture = direction_labyrinthe(position_voiture, cour->val, M);
+
+				position_voiture = cour->val;
+			}
+			else{
+				if(cour != NULL)
+					liberer_liste(&cour_chemin);
+
+				free(table_noeud);
+
+				table_noeud = dijkstra(labyrinthe, position_voiture);
+				destination = rand()%(N*M);
+				cour_chemin = liste_chemin_court(table_noeud, position_voiture, destination);
+				
+				origine_rect.x = destination_rect.x;
+				origine_rect.y = destination_rect.y;
+
+				destination_rect.x = destination_rect.w * (destination % M);
+				destination_rect.y = destination_rect.h * (destination / M);
+
+				cour = cour_chemin;
+			}
+
 			SDL_RenderPresent(renderer);
+			SDL_Delay(100);
     	}
 	}
 
-	table_noeud = dijkstra(labyrinthe, 0);
-	afficher_liste(liste_chemin_court(table_noeud, 0, 1000));
-
+	liberer_liste(&cour_chemin);
 	liberer_labyrinthe(&labyrinthe);
 
 	SDL_DestroyTexture(bg_texture);
