@@ -62,7 +62,7 @@ int main() {
         if (state<exploration.taille-1) ++state;
 		SDL_RenderPresent(renderer);
 
-		SDL_Delay(10);
+		SDL_Delay(100);
     }
 
     //afficher_arbre_couvrant(labyrinthe.graphe);
