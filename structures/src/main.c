@@ -102,12 +102,11 @@ int main(){
 			
 			afficher_voiture(position_voiture, direction_voiture, N, M, table_voiture, renderer, window);
 
-			if(cour != NULL && cour->suiv != NULL && destination != position_voiture){
-				cour = cour->suiv;
+			if(cour != NULL && destination != position_voiture){
 
 				direction_voiture = direction_labyrinthe(position_voiture, cour->val, M);
-
 				position_voiture = cour->val;
+				cour = cour->suiv;
 			}
 			else{
 				if(cour != NULL)
@@ -119,14 +118,15 @@ int main(){
 				destination = rand()%(N*M);
 
 				//debut = clock();
-				table_noeud = a_star(labyrinthe, position_voiture, destination, 1);
-				//table_noeud = dijkstra(labyrinthe, position_voiture);
+				//table_noeud = a_star(labyrinthe, position_voiture, destination, 1);
+				table_noeud = dijkstra(labyrinthe, position_voiture);
 				//fin = clock();
 
 				//printf("%lu \n", (fin - debut) * 1000 / CLOCKS_PER_SEC);
 
 				cour_chemin = liste_chemin_court(table_noeud, position_voiture, destination);
-				
+				//insertion(&cour_chemin, position_voiture);
+
 				origine_rect.x = destination_rect.x;
 				origine_rect.y = destination_rect.y;
 
@@ -137,7 +137,7 @@ int main(){
 			}
 
 			SDL_RenderPresent(renderer);
-			//SDL_Delay(100);
+			SDL_Delay(200);
     	}
 	}
 
