@@ -15,6 +15,8 @@ int main() {
 	SDL_Renderer * renderer = NULL;
     SDL_Texture * texture = NULL;
 
+    srand(1);
+
     create_sdl(&window, &renderer, "Labyrinthe");
     int fin_programme = 0,
 		pause = 0,
@@ -22,7 +24,7 @@ int main() {
         window_w,
         state=0;
 
-    laby_t laby = creer_laby(50,75,10);
+    laby_t laby = creer_laby(10,15,10);
     exploration_t exploration = parcours_prof(laby);
 
     texture = IMG_LoadTexture(renderer, "./img/tileset.png");

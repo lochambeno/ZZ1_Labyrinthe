@@ -19,7 +19,7 @@ void fisher_yate(graphe_t* p_graphe) {
 /* penser à vérifier arbre_couvrant.arrete != NULL */
 graphe_t kruskal(graphe_t graphe, int proba) {
     int i;
-    srand(time(NULL));
+    //srand(time(NULL));
     fisher_yate(&graphe);
     part_t part = creer_part(graphe.nbr_noeuds);
     graphe_t arbre_couvrant;
