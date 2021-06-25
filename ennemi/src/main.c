@@ -58,8 +58,9 @@ int main(){
 		position_ennemi3 = 0, direction_ennemi3 = 1, orientation_ennemi3 = 1;
 		
 
-	position_joueur=position_joueur_avant;
-	position_aleatoire=position_ennemi3;
+	position_joueur = position_joueur_avant;
+	position_aleatoire = position_ennemi3;
+
 	noeud_t * table_noeud = NULL,
 			* table_noeud2 = NULL,
 			* table_noeud3 = NULL;
@@ -258,6 +259,7 @@ int main(){
 
 				if (!pause && abouge==2 && position_ennemi != position_joueur && position_ennemi2 != position_joueur && position_ennemi3 != position_joueur) 
 				{
+					
 					table_noeud = dijkstra(labyrinthe, position_ennemi);
 					cour_chemin = liste_chemin_court(table_noeud, position_ennemi, position_joueur);
 					cour = cour_chemin;
@@ -283,7 +285,7 @@ int main(){
 					}
 					else {
 						liberer_liste(&cour_chemin3);
-						free(table_noeud3);
+						if (table_noeud3 != NULL) free(table_noeud3);
 						
 						position_aleatoire=rand()%(N*M);
 						table_noeud3 = dijkstra(labyrinthe, position_ennemi3);
@@ -302,16 +304,6 @@ int main(){
 				if (position_joueur==position_piece) {
 					position_piece=rand()%(N*M);
 					score+=1;
-				}
-
-				if (position_ennemi3==position_aleatoire) {
-						liberer_liste(&cour_chemin3);
-						free(table_noeud3);
-						
-						position_aleatoire=rand()%(N*M);
-						table_noeud3 = dijkstra(labyrinthe, position_ennemi3);
-						cour_chemin3 = liste_chemin_court(table_noeud3, position_ennemi3, position_aleatoire);
-						cour3 = cour_chemin3;
 				}
 
 				if(!pause && (position_ennemi == position_joueur || position_ennemi2 == position_joueur || position_ennemi3 == position_joueur))
