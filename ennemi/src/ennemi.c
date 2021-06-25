@@ -6,7 +6,7 @@
 
 void afficher_ennemi(int case_ennemi, int hauteur, int largeur, int direction, SDL_Texture ** table_ennemi_D, SDL_Texture ** table_ennemi_G, int state, int* orientation_ennemi, SDL_Renderer * renderer, SDL_Window * window){
 	int win_w, win_h;
-    float zoom = 0.66;
+    float zoom = 0.5;
 	SDL_Rect ennemi, source = {0};
 
 	SDL_GetWindowSize(window, &win_w, &win_h);

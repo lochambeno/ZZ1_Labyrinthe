@@ -32,7 +32,7 @@ int main(){
 
 
 
-	SDL_Color color_text = {255, 255, 255, 255};
+	SDL_Color color_text = {255, 255, 255, 100};
     SDL_Rect pos_text = {20, 20, 0, 0}, pos_score = {20, 20, 0, 0};
 
 
@@ -45,7 +45,7 @@ int main(){
 	SDL_Event event;
 
 	labyrinthe_t labyrinthe = init_labyrinthe(N, M);
-	int score=0, over=0, quit = 0, position_joueur = 0, position_ennemi=N*M-1,abouge=0,position_piece=rand()%(N*M), direction_ennemi = 1, orientation_ennemi = 1, state=0, state_e=0;
+	int pause=0, score=0, over=0, quit = 0, position_joueur = 0, position_ennemi=N*M-1,abouge=0,position_piece=rand()%(N*M), direction_joueur, direction_ennemi = 1, orientation_ennemi = 1, state=0, state_e=0;
 	noeud_t * table_noeud = NULL;
 	liste_t * cour_chemin = creer_liste();
 	liste_t * cour = NULL;
@@ -75,7 +75,7 @@ int main(){
 		}
 
 		if (TTF_Init() == 0) {
-			font = TTF_OpenFont("./images/SubZER0.ttf", 65);
+			font = TTF_OpenFont("./images/Code.ttf", 65);
 		
 
 			bg_texture = IMG_LoadTexture(renderer, "./images/roadTextures_tilesheet@2.png");
@@ -154,17 +154,17 @@ int main(){
 						case SDL_KEYDOWN:
 							switch(event.key.keysym.sym){
 								case SDLK_UP:
-									abouge = deplacer_joueur(&position_joueur, 1, labyrinthe.matrice_voisins[position_joueur].direction, M);
+									direction_joueur = 1;
 									break;
 								case SDLK_DOWN:
-									abouge = deplacer_joueur(&position_joueur, 2, labyrinthe.matrice_voisins[position_joueur].direction, M);
+									direction_joueur = 2;
 									break;
 								case SDLK_RIGHT:
-									abouge = deplacer_joueur(&position_joueur, 4, labyrinthe.matrice_voisins[position_joueur].direction, M);
+									direction_joueur = 4;
 									texture_joueur = joueur_D;
 									break;
 								case SDLK_LEFT:
-									abouge = deplacer_joueur(&position_joueur, 8, labyrinthe.matrice_voisins[position_joueur].direction, M);
+									direction_joueur = 8;
 									texture_joueur = joueur_G;
 									break;
 								case SDLK_ESCAPE:
@@ -177,12 +177,15 @@ int main(){
 				//Affichage du labyrinthe
 				afficher_texture_labyrinthe(window, mur ,renderer, labyrinthe);
 
-				afficher_joueur(position_joueur, N, M, texture_joueur[state], renderer, window);
+				if (!pause && direction_joueur) {
+					abouge=deplacer_joueur(&position_joueur, direction_joueur, labyrinthe.matrice_voisins[position_joueur].direction, M);
+					direction_joueur = 0;
+				}
 
-
-
-				if (abouge && position_ennemi != position_joueur) 
+				if (!pause && abouge && position_ennemi != position_joueur) 
 				{
+					
+
 					table_noeud = dijkstra(labyrinthe, position_ennemi);
 
 					cour_chemin = liste_chemin_court(table_noeud, position_ennemi, position_joueur);
@@ -199,6 +202,9 @@ int main(){
 
 					abouge=0;
 				}
+
+				afficher_joueur(position_joueur, N, M, texture_joueur[state], renderer, window);
+
 				afficher_ennemi(position_ennemi, N, M, direction_ennemi, table_ennemi_D, table_ennemi_G,state_e, &orientation_ennemi, renderer, window);
 
 				if (position_joueur==position_piece) {
@@ -206,9 +212,10 @@ int main(){
 					score+=1;
 				}
 
-				if(position_ennemi == position_joueur)
+				if(!pause && position_ennemi == position_joueur)
 				{
 					over=!over;
+					pause=!pause;
 				}
 
 				afficher_piece(position_piece, N, M, piece[state], renderer, window);
@@ -216,7 +223,9 @@ int main(){
 				
 				if (over) 
 				{
-				game_over(window, renderer, font, color_text);
+					SDL_Color color_text = {255, 255, 255, 255};
+					afficher_score(renderer, font, color_text, pos_text, pos_score, score);
+					game_over(window, renderer, font, color_text);
 				}
 
 				state=(state+1)%4;
