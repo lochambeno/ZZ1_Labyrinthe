@@ -24,6 +24,8 @@ int main(){
 	SDL_Texture * bg_texture = NULL;
 	SDL_Texture ** table_ennemi_G = NULL,
                 ** table_ennemi_D = NULL,
+				** table_ennemi2_G = NULL,
+				** table_ennemi2_D = NULL,
 				** table_ennemi3_G = NULL,
 				** table_ennemi3_D = NULL,
                 ** joueur_D = NULL,
@@ -47,15 +49,26 @@ int main(){
 	SDL_Event event;
 
 	labyrinthe_t labyrinthe = init_labyrinthe(N, M);
-	int pause=0, score=0, over=0, quit = 0, position_joueur_avant = M*(N-1), position_joueur, position_ennemi=N*M-1, abouge=0,
-		position_piece=rand()%(N*M), direction_joueur, direction_ennemi = 1, orientation_ennemi = 1, state=0,
-		position_ennemi3 = 0, direction_ennemi3 = 1, orientation_ennemi3 = 1,
-		position_aleatoire = rand()%(N*M);
+	int pause=0, score=0, over=0, quit = 0, abouge=0,
+		position_joueur_avant = M*(N-1), position_joueur, direction_joueur,
+		position_piece=rand()%(N*M), state=0,
+		position_aleatoire,
+		position_ennemi = N*M-1, direction_ennemi = 1, orientation_ennemi = 1,
+		position_ennemi2 = M-1, direction_ennemi2 = 1, orientation_ennemi2 = 1,
+		position_ennemi3 = 0, direction_ennemi3 = 1, orientation_ennemi3 = 1;
+		
 
 	position_joueur=position_joueur_avant;
-	noeud_t * table_noeud = NULL, *table_noeud3 = NULL;
-	liste_t * cour_chemin = creer_liste(), *cour_chemin3 = creer_liste();
-	liste_t * cour = NULL, *cour3 = NULL;
+	position_aleatoire=position_ennemi3;
+	noeud_t * table_noeud = NULL,
+			* table_noeud2 = NULL,
+			* table_noeud3 = NULL;
+	liste_t * cour_chemin = creer_liste(),
+			* cour_chemin2 = creer_liste(),
+			* cour_chemin3 = creer_liste();
+	liste_t * cour = NULL,
+			* cour2 = NULL,
+			* cour3 = NULL;
 
 
 
@@ -125,6 +138,21 @@ int main(){
 			table_ennemi_D[3] = IMG_LoadTexture(renderer, "./images/SkeletonD_4.png");
 
 
+			table_ennemi2_D = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 4);
+			table_ennemi2_G = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 4);
+
+			table_ennemi2_G[0] = IMG_LoadTexture(renderer, "./images/Skeleton2G_1.png");
+			table_ennemi2_G[1] = IMG_LoadTexture(renderer, "./images/Skeleton2G_2.png");
+			table_ennemi2_G[2] = IMG_LoadTexture(renderer, "./images/Skeleton2G_3.png");
+			table_ennemi2_G[3] = IMG_LoadTexture(renderer, "./images/Skeleton2G_4.png");
+
+
+			table_ennemi2_D[0] = IMG_LoadTexture(renderer, "./images/Skeleton2D_1.png");
+			table_ennemi2_D[1] = IMG_LoadTexture(renderer, "./images/Skeleton2D_2.png");
+			table_ennemi2_D[2] = IMG_LoadTexture(renderer, "./images/Skeleton2D_3.png");
+			table_ennemi2_D[3] = IMG_LoadTexture(renderer, "./images/Skeleton2D_4.png");
+
+
 			table_ennemi3_D = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 4);
 			table_ennemi3_G = (SDL_Texture **) malloc(sizeof(SDL_Texture*) * 4);
 
@@ -159,6 +187,7 @@ int main(){
 
 
 			cour = cour_chemin;
+			cour2 = cour_chemin2;
 			cour3 = cour_chemin3;
 
 
@@ -190,6 +219,8 @@ int main(){
 								case SDLK_r:
 									liberer_liste(&cour_chemin);
 									cour_chemin = creer_liste();
+									liberer_liste(&cour_chemin2);
+									cour_chemin2 = creer_liste();
 									liberer_liste(&cour_chemin3);
 									cour_chemin3 = creer_liste();
 									liberer_labyrinthe(&labyrinthe);
@@ -200,12 +231,15 @@ int main(){
 									position_joueur_avant = M*(N-1);
 									position_joueur=position_joueur_avant;
 									position_ennemi = N*M-1;
+									position_ennemi2 = M-1;
 									position_ennemi3 = 0;
 									abouge=0;
 									position_piece=rand()%(N*M);
-									position_aleatoire=rand()%(N*M);
+									position_aleatoire=position_ennemi3;
 									direction_ennemi = 1;
 									orientation_ennemi = 1;
+									direction_ennemi2 = 1;
+									orientation_ennemi2 = 1;
 									direction_ennemi3 = 1;
 									orientation_ennemi3 = 1;
 									state=0;
@@ -222,41 +256,47 @@ int main(){
 					direction_joueur = 0;
 				}
 
-				if (!pause && abouge==2 && position_ennemi != position_joueur && position_ennemi3 != position_joueur) 
+				if (!pause && abouge==2 && position_ennemi != position_joueur && position_ennemi2 != position_joueur && position_ennemi3 != position_joueur) 
 				{
 					table_noeud = dijkstra(labyrinthe, position_ennemi);
-
-					table_noeud3 = dijkstra(labyrinthe, position_ennemi3);
-
 					cour_chemin = liste_chemin_court(table_noeud, position_ennemi, position_joueur);
-						
-					cour = cour_chemin; 
-
-					cour_chemin3 = liste_chemin_court(table_noeud3, position_ennemi3, position_aleatoire);
-						
-					cour3 = cour_chemin3;
-
+					cour = cour_chemin;
 					direction_ennemi = direction_labyrinthe(position_ennemi, cour->val, M);
-
 					position_ennemi = cour->val;
 					cour = cour->suiv;
-
-					direction_ennemi3 = direction_labyrinthe(position_ennemi3, cour3->val, M);
-
-					position_ennemi3 = cour3->val;
-					cour = cour->suiv;
-					cour3 = cour3->suiv;
 					liberer_liste(&cour_chemin);
-					liberer_liste(&cour_chemin3);
 					free(table_noeud);
-					free(table_noeud3);
 
+					table_noeud2 = dijkstra(labyrinthe, position_ennemi2);
+					cour_chemin2 = liste_chemin_court(table_noeud2, position_ennemi2, position_joueur_avant);
+					cour2 = cour_chemin2;
+					direction_ennemi2 = direction_labyrinthe(position_ennemi2, cour2->val, M);
+					position_ennemi2 = cour2->val;
+					cour2 = cour2->suiv;
+					liberer_liste(&cour_chemin2);
+					free(table_noeud2);
+
+					if (cour3 != NULL && position_ennemi3!=position_aleatoire) {
+						direction_ennemi3 = direction_labyrinthe(position_ennemi3, cour3->val, M);
+						position_ennemi3 = cour3->val;
+						cour3 = cour3->suiv;
+					}
+					else {
+						liberer_liste(&cour_chemin3);
+						free(table_noeud3);
+						
+						position_aleatoire=rand()%(N*M);
+						table_noeud3 = dijkstra(labyrinthe, position_ennemi3);
+						cour_chemin3 = liste_chemin_court(table_noeud3, position_ennemi3, position_aleatoire);
+						cour3 = cour_chemin3;
+					}
 					abouge=0;
 				}
 
 				afficher_joueur(position_joueur, N, M, texture_joueur[state], renderer, window);
 
 				afficher_ennemi(position_ennemi, N, M, direction_ennemi, table_ennemi_D, table_ennemi_G, state, &orientation_ennemi, renderer, window);
+				afficher_ennemi(position_ennemi2, N, M, direction_ennemi2, table_ennemi2_D, table_ennemi2_G, state, &orientation_ennemi2, renderer, window);
 				afficher_ennemi(position_ennemi3, N, M, direction_ennemi3, table_ennemi3_D, table_ennemi3_G, state, &orientation_ennemi3, renderer, window);
 
 				if (position_joueur==position_piece) {
@@ -265,10 +305,16 @@ int main(){
 				}
 
 				if (position_ennemi3==position_aleatoire) {
-					position_aleatoire=rand()%(N*M);
+						liberer_liste(&cour_chemin3);
+						free(table_noeud3);
+						
+						position_aleatoire=rand()%(N*M);
+						table_noeud3 = dijkstra(labyrinthe, position_ennemi3);
+						cour_chemin3 = liste_chemin_court(table_noeud3, position_ennemi3, position_aleatoire);
+						cour3 = cour_chemin3;
 				}
 
-				if(!pause && (position_ennemi == position_joueur || position_ennemi3 == position_joueur))
+				if(!pause && (position_ennemi == position_joueur || position_ennemi2 == position_joueur || position_ennemi3 == position_joueur))
 				{
 					over=!over;
 					pause=!pause;
