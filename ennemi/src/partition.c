@@ -133,7 +133,8 @@ void liberer_partition(partition_t * partition){
 }
 
 void liberer_table_partition(liste_t *** table_part, int taille){
-	for(int i=0; i<taille; i++){
+	int i;
+	for(i=0; i<taille; i++){
 		if((*table_part)[i] != NULL)
 			liberer_liste(&((*table_part)[i]));
 	}
@@ -141,7 +142,8 @@ void liberer_table_partition(liste_t *** table_part, int taille){
 }
 
 void afficher_table_partition(liste_t ** table_part, int taille){
-	for(int i =0; i<taille; i++){
+	int i;
+	for(i =0; i<taille; i++){
 		if(table_part[i] != NULL){
 			printf("Classe : %d\n", i);
 			afficher_liste(table_part[i]);

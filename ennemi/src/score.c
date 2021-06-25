@@ -8,7 +8,7 @@
 void afficher_score(SDL_Renderer* renderer, TTF_Font* font, SDL_Color color, SDL_Rect pos_text, SDL_Rect pos_score, int i_score) {
     SDL_Surface* text_surface = NULL, *score_surface = NULL;
 
-    text_surface = TTF_RenderText_Blended(font, "SC0RE: ", color);
+    text_surface = TTF_RenderText_Blended(font, "SC0RE:", color);
 
     char s_score[20];
     sprintf(s_score, "%d", i_score);

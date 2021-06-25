@@ -19,7 +19,7 @@ void afficher_joueur(int case_joueur, int hauteur, int largeur, SDL_Texture * te
 }
 
 int deplacer_joueur(int* case_joueur, int direction, int voisin, int largeur) {
-    int succes = direction & voisin;
+    int succes = 0;
     if (direction & voisin) {
         switch (direction) {
             case 1:
@@ -35,6 +35,7 @@ int deplacer_joueur(int* case_joueur, int direction, int voisin, int largeur) {
                 --(*case_joueur);
                 break;
         }
+        succes = 1;
     }
     return succes;
 }
